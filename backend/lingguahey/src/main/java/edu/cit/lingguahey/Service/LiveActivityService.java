@@ -6,38 +6,37 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import edu.cit.lingguahey.Entity.ActivityEntity;
-import edu.cit.lingguahey.Repository.ActivityRepository;
+import edu.cit.lingguahey.Entity.LiveActivityEntity;
+import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class ActivityService {
+public class LiveActivityService {
     
     @Autowired
-    ActivityRepository activityRepo;
+    LiveActivityRepository activityRepo;
 
     // Create
-    public ActivityEntity postActivityEntity(ActivityEntity activity) {
+    public LiveActivityEntity postActivityEntity(LiveActivityEntity activity) {
         return activityRepo.save(activity);
     }
 
     // Read All Activities
-    public List<ActivityEntity> getAllActivityEntity() {
+    public List<LiveActivityEntity> getAllActivityEntity() {
         return activityRepo.findAll();
     }
 
     // Read Single Activity
-    public ActivityEntity getActivityEntity(int activityId) {
+    public LiveActivityEntity getActivityEntity(int activityId) {
         return activityRepo.findById(activityId).get();
     }
 
     // Update
-    public ActivityEntity putActivityEntity(int activityId, ActivityEntity newActivity) {
+    public LiveActivityEntity putActivityEntity(int activityId, LiveActivityEntity newActivity) {
         try {
-            ActivityEntity activity = activityRepo.findById(activityId).get();
+            LiveActivityEntity activity = activityRepo.findById(activityId).get();
             activity.setActivityName(newActivity.getActivityName());
-            activity.setCompleted(newActivity.isCompleted());
-            activity.setGameType(newActivity.getGameType());
+            activity.setDeployed(newActivity.isDeployed());
             return activityRepo.save(activity);
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("Activity " + activityId + " not found!");

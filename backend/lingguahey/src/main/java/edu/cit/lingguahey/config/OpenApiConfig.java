@@ -22,7 +22,15 @@ import io.swagger.v3.oas.annotations.servers.Server;
     servers = {
         @Server(
             description = "Local ENV",
-            url = "http://localhost:8080"
+            url = "http://localhost:80"
+        ),
+        @Server(
+            description= "AWS EC2",
+            url = "http://18.139.221.124:8080"
+        ),
+        @Server(
+            description= "AWS EC2 Tunnel",
+            url = "https://lingguahey.duckdns.org"
         )
     },
     security = {

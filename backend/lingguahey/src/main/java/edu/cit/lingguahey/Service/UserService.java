@@ -22,9 +22,6 @@ public class UserService {
     
     // Create
     public UserEntity postUserEntity(UserEntity user){
-        if (user.getSubscriptionStatus() == false){
-            user.setSubscriptionStatus(false);
-        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
@@ -58,7 +55,9 @@ public class UserService {
             if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword())) {
                 user.setPassword(passwordEncoder.encode(newUser.getPassword()));
             }
-            user.setSubscriptionStatus(newUser.getSubscriptionStatus());
+            user.setIdNumber(newUser.getIdNumber());
+            user.setTotalPoints(newUser.getTotalPoints());
+            user.setProfilePic(newUser.getProfilePic());
             return userRepo.save(user);
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("User "+ userId + "not found!");

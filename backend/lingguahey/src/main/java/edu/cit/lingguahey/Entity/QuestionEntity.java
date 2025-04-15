@@ -26,17 +26,23 @@ public class QuestionEntity {
     @Column(name = "question_image", columnDefinition = "MEDIUMBLOB", nullable = true)
     private byte[] questionImage;
 
-    @OneToMany(mappedBy = "question")
-    private List<ChoiceEntity> choices;
+    //Relations
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
+    private LiveActivityEntity activities;
+
+    @ManyToOne
+    @JoinColumn(name = "lesson_id")
+    private LessonActivityEntity lessons;
 
     @OneToOne
     @JoinColumn(name = "score_id")
     private ScoreEntity score;
 
-    @ManyToOne
-    @JoinColumn(name = "activity_id")
-    private ActivityEntity activity;
+    @OneToMany(mappedBy = "question")
+    private List<ChoiceEntity> choices;
 
+    //Constructor, Getter, Setters
     public QuestionEntity(){
         super();
     }
@@ -91,12 +97,24 @@ public class QuestionEntity {
         this.score = score;
     }
 
-    public ActivityEntity getActivity() {
-        return activity;
+    public LiveActivityEntity getActivity() {
+        return activities;
     }
 
-    public void setActivity(ActivityEntity activity) {
-        this.activity = activity;
+    public void setActivity(LiveActivityEntity activities) {
+        this.activities = activities;
+    }
+
+    public LessonActivityEntity getLesson() {
+        return lessons;
+    }
+
+    public void setLesson(LessonActivityEntity lessons) {
+        this.lessons = lessons;
+    }
+
+    public void setQuestionId(int questionId) {
+        this.questionId = questionId;
     }
    
 }

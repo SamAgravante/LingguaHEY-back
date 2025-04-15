@@ -3,9 +3,9 @@ package edu.cit.lingguahey.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import edu.cit.lingguahey.Entity.ActivityEntity;
+import edu.cit.lingguahey.Entity.ClassroomEntity;
 
 @Repository
-public interface ActivityRepository extends JpaRepository<ActivityEntity, Integer>{
+public interface ClassroomRepository extends JpaRepository<ClassroomEntity, Integer>{
 
 }

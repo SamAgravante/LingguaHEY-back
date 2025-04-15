@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.cit.lingguahey.Entity.ActivityEntity;
-import edu.cit.lingguahey.Service.ActivityService;
+import edu.cit.lingguahey.Entity.LiveActivityEntity;
+import edu.cit.lingguahey.Service.LiveActivityService;
 import edu.cit.lingguahey.model.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -25,10 +25,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("api/lingguahey/activities")
 @Tag(name = "Activity")
-public class ActivityController {
+public class LiveActivityController {
 
     @Autowired
-    ActivityService activityServ;
+    LiveActivityService activityServ;
 
     // Create
     @PostMapping("")
@@ -37,7 +37,7 @@ public class ActivityController {
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Activity data to create (without ID)",
             content = @io.swagger.v3.oas.annotations.media.Content(
-                schema = @Schema(implementation = ActivityEntity.class, hidden = true) // Hide ID in example
+                schema = @Schema(implementation = LiveActivityEntity.class, hidden = true) // Hide ID in example
             )
         ),
         responses = {
@@ -50,7 +50,7 @@ public class ActivityController {
             )
         }
     )
-    public ActivityEntity postActivityEntity(@RequestBody ActivityEntity activity) {
+    public LiveActivityEntity postActivityEntity(@RequestBody LiveActivityEntity activity) {
         return activityServ.postActivityEntity(activity);
     }
 
@@ -65,7 +65,7 @@ public class ActivityController {
             )
         }
     )
-    public List<ActivityEntity> getAllActivityEntity() {
+    public List<LiveActivityEntity> getAllActivityEntity() {
         return activityServ.getAllActivityEntity();
     }
 
@@ -83,7 +83,7 @@ public class ActivityController {
             )
         }
     )
-    public ActivityEntity getActivityEntity(@PathVariable int id) {
+    public LiveActivityEntity getActivityEntity(@PathVariable int id) {
         return activityServ.getActivityEntity(id);
     }
 
@@ -104,7 +104,7 @@ public class ActivityController {
             )
         }
     )
-    public ActivityEntity putActivityEntity(@RequestParam int id, @RequestBody ActivityEntity newActivity) {
+    public LiveActivityEntity putActivityEntity(@RequestParam int id, @RequestBody LiveActivityEntity newActivity) {
         return activityServ.putActivityEntity(id, newActivity);
     }
 

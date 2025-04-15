@@ -15,8 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Builder;
 
@@ -33,8 +33,11 @@ public class UserEntity implements UserDetails {
     private String lastName;
     private String email;
     private String password;
-    @Builder.Default
-    private boolean subscriptionStatus = false;
+    private String idNumber;
+    private int totalPoints;
+    @Lob
+    @Column(name = "profile_picture", columnDefinition = "MEDIUMBLOB", nullable = true)
+    private byte[] profilePic;
 
     //Spring Security ug JWT
     @Enumerated(EnumType.STRING)
@@ -74,62 +77,56 @@ public class UserEntity implements UserDetails {
     }
 
     //Entity Relations
+    @ManyToOne
+    @JoinColumn(name = "classroom_id")
+    private ClassroomEntity classroom;
+
     @OneToMany(mappedBy = "user")
     private List<ScoreEntity> scores;
-
-    @ManyToMany
-    @JoinTable(
-        name = "user_stories",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "story_id")
-    )
-    private List<StoryEntity> stories;
-
-    @ManyToMany
-    @JoinTable(
-        name = "user_activities",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "activity_id")
-    )
-    private List<ActivityEntity> activities;
 
     public UserEntity(){
         super();
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, Role role) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-    }
-
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, boolean subscriptionStatus, Role role) {
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.subscriptionStatus = subscriptionStatus;
+        this.idNumber = idNumber;
+        this.totalPoints = totalPoints;
         this.role = role;
     }
 
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, byte[] profilePic, Role role) {
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.idNumber = idNumber;
+        this.totalPoints = totalPoints;
+        this.profilePic = profilePic;
+        this.role = role;
+    }
+    
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, String password,
-            boolean subscriptionStatus, Role role, List<Token> tokens, List<ScoreEntity> scores,
-            List<StoryEntity> stories, List<ActivityEntity> activities) {
+            String idNumber, int totalPoints, byte[] profilePic, Role role, List<Token> tokens,
+            ClassroomEntity classroom, List<ScoreEntity> scores) {
         this.userId = userId;
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.subscriptionStatus = subscriptionStatus;
+        this.idNumber = idNumber;
+        this.totalPoints = totalPoints;
+        this.profilePic = profilePic;
         this.role = role;
         this.tokens = tokens;
+        this.classroom = classroom;
         this.scores = scores;
-        this.stories = stories;
-        this.activities = activities;
     }
 
     public int getUserId() {
@@ -177,12 +174,28 @@ public class UserEntity implements UserDetails {
         this.password = password;
     }
 
-    public boolean getSubscriptionStatus() {
-        return subscriptionStatus;
+    public String getIdNumber() {
+        return idNumber;
     }
 
-    public void setSubscriptionStatus(boolean subscriptionStatus) {
-        this.subscriptionStatus = subscriptionStatus;
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
+    }
+
+    public int getTotalPoints() {
+        return totalPoints;
+    }
+
+    public void setTotalPoints(int totalPoints) {
+        this.totalPoints = totalPoints;
+    }
+
+    public byte[] getProfilePic() {
+        return profilePic;
+    }
+
+    public void setProfilePic(byte[] profilePic) {
+        this.profilePic = profilePic;
     }
 
     public List<ScoreEntity> getScores() {
@@ -191,22 +204,6 @@ public class UserEntity implements UserDetails {
     
     public void setScores(List<ScoreEntity> scores) {
         this.scores = scores;
-    }
-    
-    public List<StoryEntity> getStories() {
-        return stories;
-    }
-    
-    public void setStories(List<StoryEntity> stories) {
-        this.stories = stories;
-    }
-    
-    public List<ActivityEntity> getActivities() {
-        return activities;
-    }
-    
-    public void setActivities(List<ActivityEntity> activities) {
-        this.activities = activities;
     }
     
 }
