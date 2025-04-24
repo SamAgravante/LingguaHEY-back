@@ -34,12 +34,12 @@ public class ChoiceService {
     // Update
     public ChoiceEntity putChoiceEntity(int choiceId, ChoiceEntity newChoice) {
         try {
-        ChoiceEntity choice = choiceRepo.findById(choiceId).get();
-        choice.setChoiceText(newChoice.getChoiceText());
-        choice.setCorrect(newChoice.isCorrect());
-        return choiceRepo.save(choice);
+            ChoiceEntity choice = choiceRepo.findById(choiceId).get();
+            choice.setChoiceText(newChoice.getChoiceText());
+            choice.setCorrect(newChoice.isCorrect());
+            return choiceRepo.save(choice);
         } catch (NoSuchElementException e) {
-            throw new EntityNotFoundException("Activity " + choiceId + " not found!");
+            throw new EntityNotFoundException("Choice " + choiceId + " not found!");
         }
     }
 

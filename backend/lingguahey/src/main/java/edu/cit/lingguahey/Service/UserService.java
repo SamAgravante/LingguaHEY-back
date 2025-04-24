@@ -52,8 +52,10 @@ public class UserService {
             user.setMiddleName(newUser.getMiddleName());
             user.setLastName(newUser.getLastName());
             user.setEmail(newUser.getEmail());
-            if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword())) {
-                user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+            if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
+                if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword())) {
+                    user.setPassword(passwordEncoder.encode(newUser.getPassword()));
+                }
             }
             user.setIdNumber(newUser.getIdNumber());
             user.setTotalPoints(newUser.getTotalPoints());

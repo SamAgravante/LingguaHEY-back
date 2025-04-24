@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.ScoreEntity;
@@ -86,7 +85,7 @@ public class ScoreController {
     }
 
     // Update
-    @PutMapping("")
+    @PutMapping("/{id}")
     @Operation(
         description = "Update a score",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -106,7 +105,7 @@ public class ScoreController {
             )
         }
     )
-    public ScoreEntity putScoreEntity(@RequestParam int id, @RequestBody ScoreEntity newScore) {
+    public ScoreEntity putScoreEntity(@PathVariable int id, @RequestBody ScoreEntity newScore) {
         return scoreService.putScoreEntity(id, newScore);
     }
 

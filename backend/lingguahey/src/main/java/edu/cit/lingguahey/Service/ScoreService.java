@@ -34,11 +34,11 @@ public class ScoreService {
     // Update
     public ScoreEntity putScoreEntity(int scoreId, ScoreEntity newScore) {
         try {
-        ScoreEntity score = scoreRepo.findById(scoreId).get();
-        score.setScore(newScore.getScore());
-        return scoreRepo.save(score);
+            ScoreEntity score = scoreRepo.findById(scoreId).get();
+            score.setScore(newScore.getScore());
+            return scoreRepo.save(score);
         } catch (NoSuchElementException e) {
-            throw new EntityNotFoundException("Activity " + scoreId + " not found!");
+            throw new EntityNotFoundException("Score " + scoreId + " not found!");
         }
     }
 

@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.ChoiceEntity;
@@ -86,7 +85,7 @@ public class ChoiceController {
     }
 
     // Update
-    @PutMapping("")
+    @PutMapping("/{id}")
     @Operation(
         description = "Update a choice",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
@@ -106,7 +105,7 @@ public class ChoiceController {
             )
         }
     )
-    public ChoiceEntity putChoiceEntity(@RequestParam int id, @RequestBody ChoiceEntity newChoice) {
+    public ChoiceEntity putChoiceEntity(@PathVariable int id, @RequestBody ChoiceEntity newChoice) {
         return choiceService.putChoiceEntity(id, newChoice);
     }
 

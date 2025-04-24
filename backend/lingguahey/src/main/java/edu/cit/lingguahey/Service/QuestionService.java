@@ -40,7 +40,7 @@ public class QuestionService {
             question.setQuestionImage(newQuestion.getQuestionImage());
             return questionRepo.save(question);
         } catch (NoSuchElementException e) {
-            throw new EntityNotFoundException("Activity " + questionId + " not found!");
+            throw new EntityNotFoundException("Question " + questionId + " not found!");
         }
     }
 

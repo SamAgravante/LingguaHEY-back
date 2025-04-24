@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
@@ -23,8 +22,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
-@RequestMapping("api/lingguahey/activities")
-@Tag(name = "Activity")
+@RequestMapping("api/lingguahey/live-activities")
+@Tag(name = "Live Activity")
 public class LiveActivityController {
 
     @Autowired
@@ -88,7 +87,7 @@ public class LiveActivityController {
     }
 
     // Update
-    @PutMapping("")
+    @PutMapping("/{id}")
     @Operation(
         description = "Update an activity",
         responses = {
@@ -104,7 +103,7 @@ public class LiveActivityController {
             )
         }
     )
-    public LiveActivityEntity putActivityEntity(@RequestParam int id, @RequestBody LiveActivityEntity newActivity) {
+    public LiveActivityEntity putActivityEntity(@PathVariable int id, @RequestBody LiveActivityEntity newActivity) {
         return activityServ.putActivityEntity(id, newActivity);
     }
 
