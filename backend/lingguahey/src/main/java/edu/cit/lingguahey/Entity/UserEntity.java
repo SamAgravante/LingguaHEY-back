@@ -84,6 +84,9 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<ScoreEntity> scores;
 
+    @OneToMany(mappedBy = "teacher")
+    private List<ClassroomEntity> classrooms;
+
     public UserEntity(){
         super();
     }
@@ -113,7 +116,7 @@ public class UserEntity implements UserDetails {
     
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, String password,
             String idNumber, int totalPoints, byte[] profilePic, Role role, List<Token> tokens,
-            ClassroomEntity classroom, List<ScoreEntity> scores) {
+            ClassroomEntity classroom, List<ScoreEntity> scores, List<ClassroomEntity> classrooms) {
         this.userId = userId;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -127,6 +130,7 @@ public class UserEntity implements UserDetails {
         this.tokens = tokens;
         this.classroom = classroom;
         this.scores = scores;
+        this.classrooms = classrooms;
     }
 
     public int getUserId() {
@@ -198,12 +202,44 @@ public class UserEntity implements UserDetails {
         this.profilePic = profilePic;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public List<Token> getTokens() {
+        return tokens;
+    }
+
+    public void setTokens(List<Token> tokens) {
+        this.tokens = tokens;
+    }
+
     public List<ScoreEntity> getScores() {
         return scores;
     }
     
     public void setScores(List<ScoreEntity> scores) {
         this.scores = scores;
+    }
+
+    public ClassroomEntity getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(ClassroomEntity classroom) {
+        this.classroom = classroom;
+    }
+
+    public List<ClassroomEntity> getClassrooms() {
+        return classrooms;
+    }
+
+    public void setClassrooms(List<ClassroomEntity> classrooms) {
+        this.classrooms = classrooms;
     }
     
 }

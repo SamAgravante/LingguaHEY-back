@@ -14,6 +14,10 @@ import static edu.cit.lingguahey.Entity.Permission.USER_CREATE;
 import static edu.cit.lingguahey.Entity.Permission.USER_DELETE;
 import static edu.cit.lingguahey.Entity.Permission.USER_READ;
 import static edu.cit.lingguahey.Entity.Permission.USER_UPDATE;
+import static edu.cit.lingguahey.Entity.Permission.TEACHER_CREATE;
+import static edu.cit.lingguahey.Entity.Permission.TEACHER_DELETE;
+import static edu.cit.lingguahey.Entity.Permission.TEACHER_READ;
+import static edu.cit.lingguahey.Entity.Permission.TEACHER_UPDATE;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -37,7 +41,16 @@ public enum Role {
             USER_READ,
             USER_UPDATE,
             USER_DELETE
-        ));
+        )
+    ),
+    TEACHER(
+        Set.of(
+            TEACHER_CREATE,
+            TEACHER_READ,
+            TEACHER_UPDATE,
+            TEACHER_DELETE
+        )
+    );
 
     @Getter
     private final Set<Permission> permissions;

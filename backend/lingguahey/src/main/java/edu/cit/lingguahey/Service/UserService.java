@@ -53,7 +53,7 @@ public class UserService {
             user.setLastName(newUser.getLastName());
             user.setEmail(newUser.getEmail());
             if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
-                if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword())) {
+                if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword()) && !newUser.getPassword().startsWith("$2a$")) {
                     user.setPassword(passwordEncoder.encode(newUser.getPassword()));
                 }
             }

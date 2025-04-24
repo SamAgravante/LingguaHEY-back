@@ -1,12 +1,17 @@
 package edu.cit.lingguahey.Service;
 
 import edu.cit.lingguahey.Entity.ClassroomEntity;
+import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
+import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -15,10 +20,19 @@ public class ClassroomService {
 
     @Autowired
     private ClassroomRepository classroomRepo;
+    
+    @Autowired
+    private UserRepository userRepo;
 
+    private UserEntity getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userRepo.findByEmail(auth.getName()).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
 
     // Create
     public ClassroomEntity postClassroomEntity(ClassroomEntity classroom) {
+        UserEntity teacher = getCurrentUser();
+        classroom.setTeacher(teacher);
         return classroomRepo.save(classroom);
     }
 
@@ -28,8 +42,16 @@ public class ClassroomService {
     }
 
     // Read by ID
-    public ClassroomEntity getClassroomEntity(int classroomId) {
-        return classroomRepo.findById(classroomId).get();
+    public ClassroomEntity getClassroomEntity(int classroomId) throws AccessDeniedException {
+        ClassroomEntity classroom = classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found"));
+        
+        UserEntity currentUser = getCurrentUser();
+        if (currentUser.getRole().name().equals("TEACHER") && (classroom.getTeacher() == null || !(classroom.getTeacher().getUserId() == currentUser.getUserId()))) {
+            throw new AccessDeniedException("You do not own this classroom");
+        }
+
+        return classroom;
     }
 
     // Update

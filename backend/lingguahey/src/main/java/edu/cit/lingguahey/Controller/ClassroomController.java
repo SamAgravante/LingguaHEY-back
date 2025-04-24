@@ -1,5 +1,6 @@
 package edu.cit.lingguahey.Controller;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class ClassroomController {
             )
         }
     )
-    public ClassroomEntity getClassroomEntity(@PathVariable int id) {
+    public ClassroomEntity getClassroomEntity(@PathVariable int id) throws AccessDeniedException {
         return classroomService.getClassroomEntity(id);
     }
 
