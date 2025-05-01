@@ -33,6 +33,9 @@ import static edu.cit.lingguahey.Entity.Permission.USER_DELETE;
 import static edu.cit.lingguahey.Entity.Permission.USER_READ;
 import static edu.cit.lingguahey.Entity.Permission.USER_UPDATE;
 
+//test
+import static edu.cit.lingguahey.Entity.Permission.USER_CREATE;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -115,6 +118,12 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(POST, "/api/lingguahey/users/**").hasAnyAuthority(ADMIN_CREATE.getPermission())
                 .requestMatchers(PUT, "/api/lingguahey/users/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), USER_UPDATE.getPermission(), TEACHER_UPDATE.getPermission())
                 .requestMatchers(DELETE, "/api/lingguahey/users/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), USER_DELETE.getPermission(), TEACHER_DELETE.getPermission())
+
+                //TTS
+                .requestMatchers(GET, "/api/lingguahey/tts/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission(), TEACHER_READ.getPermission())
+                .requestMatchers(POST, "/api/lingguahey/tts/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), USER_CREATE.getPermission(), TEACHER_CREATE.getPermission())
+                .requestMatchers(PUT, "/api/lingguahey/tts/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), TEACHER_UPDATE.getPermission())
+                .requestMatchers(DELETE, "/api/lingguahey/tts/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), TEACHER_DELETE.getPermission())
 
                 .anyRequest()
                 .authenticated()
