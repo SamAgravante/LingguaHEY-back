@@ -35,6 +35,8 @@ public class RegisterRequest {
     @Builder.Default
     private int totalPoints = 0;
     @Builder.Default
+    private boolean subscriptionStatus = false;
+    @Builder.Default
     private Role role = Role.USER; 
 
 }

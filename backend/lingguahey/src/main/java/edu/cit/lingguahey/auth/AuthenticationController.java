@@ -27,6 +27,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     @Operation(
+        summary = "Register a new user",
         description = "Creates a new user and returns a JWT token upon successful registration",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Registration request body",
@@ -47,6 +48,7 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     @Operation(
+        summary = "Login a user",
         description = "Logs in a user and returns a JWT token upon successful authentication",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Authentication request body",

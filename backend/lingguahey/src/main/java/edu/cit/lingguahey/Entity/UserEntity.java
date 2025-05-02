@@ -6,7 +6,10 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import edu.cit.lingguahey.token.Token;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -35,6 +38,8 @@ public class UserEntity implements UserDetails {
     private String password;
     private String idNumber;
     private int totalPoints;
+    @Builder.Default
+    private boolean subscriptionStatus = false;
     @Lob
     @Column(name = "profile_picture", columnDefinition = "MEDIUMBLOB", nullable = true)
     private byte[] profilePic;
@@ -44,6 +49,7 @@ public class UserEntity implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference(value = "user-tokens")
     private List<Token> tokens;
 
     @Override
@@ -81,7 +87,8 @@ public class UserEntity implements UserDetails {
     @JoinColumn(name = "classroom_id")
     private ClassroomEntity classroom;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference(value = "user-scores")
     private List<ScoreEntity> scores;
 
     @OneToMany(mappedBy = "teacher")
@@ -102,7 +109,7 @@ public class UserEntity implements UserDetails {
         this.role = role;
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, byte[] profilePic, Role role) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, boolean subscriptionStatus, byte[] profilePic, Role role) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -110,12 +117,13 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.subscriptionStatus = subscriptionStatus;
         this.profilePic = profilePic;
         this.role = role;
     }
     
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, String password,
-            String idNumber, int totalPoints, byte[] profilePic, Role role, List<Token> tokens,
+            String idNumber, int totalPoints, boolean subscriptionStatus, byte[] profilePic, Role role, List<Token> tokens,
             ClassroomEntity classroom, List<ScoreEntity> scores, List<ClassroomEntity> classrooms) {
         this.userId = userId;
         this.firstName = firstName;
@@ -125,6 +133,7 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.subscriptionStatus = subscriptionStatus;
         this.profilePic = profilePic;
         this.role = role;
         this.tokens = tokens;
@@ -192,6 +201,14 @@ public class UserEntity implements UserDetails {
 
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
+    }
+
+    public boolean getSubscriptionStatus() {
+        return subscriptionStatus;
+    }
+
+    public void setSubscriptionStatus(boolean subscriptionStatus) {
+        this.subscriptionStatus = subscriptionStatus;
     }
 
     public byte[] getProfilePic() {

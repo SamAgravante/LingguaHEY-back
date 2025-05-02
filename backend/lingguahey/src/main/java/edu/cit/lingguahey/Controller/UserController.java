@@ -33,7 +33,8 @@ public class UserController {
     // Create
     @PostMapping("")
     @Operation(
-        description = "Create a new user",
+        summary = "Create a new user",
+        description = "Creates a new user in the system",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "User data to create (without ID)",
             content = @Content(schema = @Schema(implementation = UserEntity.class))
@@ -48,6 +49,8 @@ public class UserController {
             )
         }
     )
+    // access
+    @PreAuthorize("hasAuthority('admin:create')")
     public UserEntity postUserEntity(@RequestBody UserEntity user){
         return userServ.postUserEntity(user);
     }
@@ -55,7 +58,8 @@ public class UserController {
     // Read All Users
     @GetMapping("")
     @Operation(
-        description = "Get all users",
+        summary = "Get all users",
+        description = "Retrieves a list of all users in the system",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -63,6 +67,7 @@ public class UserController {
             )
         }
     )
+    // access
     @PreAuthorize("hasAuthority('admin:read')")
     public List<UserEntity> getAllUserEntity(){
         return userServ.getAllUserEntity();
@@ -71,7 +76,8 @@ public class UserController {
     // Read Single User
     @GetMapping("/{id}")
     @Operation(
-        description = "Get a user by ID",
+        summary = "Get a user by ID",
+        description = "Retrieves a specific user by their ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "User not found",
@@ -82,6 +88,7 @@ public class UserController {
             )
         }
     )
+    // access
     @PreAuthorize("#id == principal.userId or hasAuthority('admin:read')")
     public UserEntity getUserEntity(@PathVariable int id){
         return userServ.getUserEntity(id);
@@ -90,7 +97,8 @@ public class UserController {
     // Update
     @PutMapping("/{id}")
     @Operation(
-        description = "Update a user",
+        summary = "Update a user",
+        description = "Updates an existing user's information by their ID",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "User data to update (with ID)",
             content = @Content(schema = @Schema(implementation = UserEntity.class))
@@ -108,6 +116,7 @@ public class UserController {
             )
         }
     )
+    // access
     @PreAuthorize("#id == principal.userId or hasAuthority('admin:update')")
     public UserEntity putUserEntity(@PathVariable int id, @RequestBody UserEntity newUserEntity){
         return userServ.putUserEntity(id, newUserEntity);
@@ -116,7 +125,8 @@ public class UserController {
     // Delete
     @DeleteMapping("/{id}")
     @Operation(
-        description = "Delete a user by ID",
+        summary = "Delete a user",
+        description = "Deletes a user by their ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "User deleted successfully"),
             @ApiResponse(responseCode = "404", description = "User not found",
@@ -127,6 +137,7 @@ public class UserController {
             )
         }
     )
+    // access
     @PreAuthorize("#id == principal.userId or hasAuthority('admin:delete')")
     public String deleteUserEntity(@PathVariable int id){
         return userServ.deleteUserEntity(id);

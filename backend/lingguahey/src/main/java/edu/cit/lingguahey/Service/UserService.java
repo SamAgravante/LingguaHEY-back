@@ -22,6 +22,9 @@ public class UserService {
     
     // Create
     public UserEntity postUserEntity(UserEntity user){
+        if (user.getSubscriptionStatus() == false){
+            user.setSubscriptionStatus(false);
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
@@ -59,6 +62,7 @@ public class UserService {
             }
             user.setIdNumber(newUser.getIdNumber());
             user.setTotalPoints(newUser.getTotalPoints());
+            user.setSubscriptionStatus(newUser.getSubscriptionStatus());
             user.setProfilePic(newUser.getProfilePic());
             return userRepo.save(user);
         } catch (NoSuchElementException e) {

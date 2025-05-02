@@ -32,6 +32,7 @@ import static edu.cit.lingguahey.Entity.Permission.TEACHER_UPDATE;
 import static edu.cit.lingguahey.Entity.Permission.USER_DELETE;
 import static edu.cit.lingguahey.Entity.Permission.USER_READ;
 import static edu.cit.lingguahey.Entity.Permission.USER_UPDATE;
+import static edu.cit.lingguahey.Entity.Permission.USER_CREATE;
 
 @Configuration
 @EnableWebSecurity
@@ -87,7 +88,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(DELETE, "/api/lingguahey/classrooms/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), TEACHER_DELETE.getPermission())
                 //Choices
                 .requestMatchers(GET, "/api/lingguahey/choices/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission(), TEACHER_READ.getPermission())
-                .requestMatchers(POST, "/api/lingguahey/choices/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), TEACHER_CREATE.getPermission())
+                .requestMatchers(POST, "/api/lingguahey/choices/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), TEACHER_CREATE.getPermission(), USER_CREATE.getPermission())
                 .requestMatchers(PUT, "/api/lingguahey/choices/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), TEACHER_UPDATE.getPermission())
                 .requestMatchers(DELETE, "/api/lingguahey/choices/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), TEACHER_DELETE.getPermission())
                 //Questions
@@ -97,13 +98,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(DELETE, "/api/lingguahey/questions/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), TEACHER_DELETE.getPermission())
                 //Scores
                 .requestMatchers(GET, "/api/lingguahey/scores/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission(), TEACHER_READ.getPermission())
-                .requestMatchers(POST, "/api/lingguahey/scores/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), TEACHER_CREATE.getPermission())
+                .requestMatchers(POST, "/api/lingguahey/scores/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), TEACHER_CREATE.getPermission(), USER_CREATE.getPermission())
                 .requestMatchers(PUT, "/api/lingguahey/scores/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), TEACHER_UPDATE.getPermission())
                 .requestMatchers(DELETE, "/api/lingguahey/scores/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), TEACHER_DELETE.getPermission())
                 //Activities
                 .requestMatchers(GET, "/api/lingguahey/activities/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission())
                 .requestMatchers(POST, "/api/lingguahey/activities/**").hasAnyAuthority(ADMIN_CREATE.getPermission())
-                .requestMatchers(PUT, "/api/lingguahey/activities/**").hasAnyAuthority(ADMIN_UPDATE.getPermission())
+                .requestMatchers(PUT, "/api/lingguahey/activities/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), USER_UPDATE.getPermission())
                 .requestMatchers(DELETE, "/api/lingguahey/activities/**").hasAnyAuthority(ADMIN_DELETE.getPermission())
                 //Live Activities
                 .requestMatchers(GET, "/api/lingguahey/live-activities/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission(), TEACHER_READ.getPermission())

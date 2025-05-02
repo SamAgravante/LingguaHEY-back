@@ -70,9 +70,32 @@ public class ClassroomService {
     public String deleteClassroomEntity(int classroomId) {
         if (classroomRepo.findById(classroomId) != null) {
             classroomRepo.deleteById(classroomId);
-            return "Choice " + classroomId + " deleted successfully!";
+            return "Classroom " + classroomId + " deleted successfully!";
         } else {
-            return "Choice " + classroomId + " not found!";
+            return "Classroom " + classroomId + " not found!";
         }
+    }
+
+    // Add Student to Classroom
+    public String addStudentToClassroom(int classroomId, int studentId) throws AccessDeniedException {
+        UserEntity teacher = getCurrentUser();
+        ClassroomEntity classroom = classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found"));
+
+        if (teacher.getRole().name().equals("TEACHER") && (classroom.getTeacher() == null || !(classroom.getTeacher().getUserId() == teacher.getUserId()))) {
+            throw new AccessDeniedException("You do not own this classroom");
+        }
+
+        UserEntity student = userRepo.findById(studentId)
+            .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+
+        if (classroom.getUsers().contains(student)) {
+            return "Student is already in this classroom!";
+        }
+
+        classroom.getUsers().add(student);
+        classroomRepo.save(classroom);
+
+        return "Student added successfully to the classroom!";
     }
 }

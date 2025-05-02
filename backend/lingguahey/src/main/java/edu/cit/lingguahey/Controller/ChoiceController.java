@@ -3,6 +3,8 @@ package edu.cit.lingguahey.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,19 +29,20 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class ChoiceController {
 
     @Autowired
-    private ChoiceService choiceService;
+    private ChoiceService choiceServ;
 
-    // Create
-    @PostMapping("")
+    // Create and Add Choice to Question
+    @PostMapping("/questions/{questionId}")
     @Operation(
-        description = "Create a new choice",
+        summary = "Create a choice for a specific question",
+        description = "Creates a new choice and associates it with a specific question",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Choice data to create (without ID)",
             content = @Content(schema = @Schema(implementation = ChoiceEntity.class))
         ),
         responses = {
-            @ApiResponse(responseCode = "201", description = "Choice created successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request",
+            @ApiResponse(responseCode = "201", description = "Choice created and added to question successfully"),
+            @ApiResponse(responseCode = "404", description = "Question not found",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -47,14 +50,17 @@ public class ChoiceController {
             )
         }
     )
-    public ChoiceEntity postChoiceEntity(@RequestBody ChoiceEntity choice) {
-        return choiceService.postChoiceEntity(choice);
+    @PreAuthorize("hasAuthority('admin:create')")
+    public ResponseEntity<ChoiceEntity> postChoiceForQuestion(@PathVariable int questionId, @RequestBody ChoiceEntity choice) {
+        ChoiceEntity postChoice = choiceServ.postChoiceForQuestion(questionId, choice);
+        return ResponseEntity.status(201).body(postChoice);
     }
 
     // Read All Choices
     @GetMapping("")
     @Operation(
-        description = "Get all choices",
+        summary = "Get all choices",
+        description = "Retrieves a list of all choices",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -62,14 +68,16 @@ public class ChoiceController {
             )
         }
     )
-    public List<ChoiceEntity> getAllChoiceEntity() {
-        return choiceService.getAllChoiceEntity();
+    public ResponseEntity<List<ChoiceEntity>> getAllChoiceEntity() {
+        List<ChoiceEntity> choices = choiceServ.getAllChoiceEntity();
+        return ResponseEntity.ok().body(choices);
     }
 
     // Read Single Choice
     @GetMapping("/{id}")
     @Operation(
-        description = "Get a choice by ID",
+        summary = "Get a choice by ID",
+        description = "Retrieves a specific choice by its ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Choice not found",
@@ -80,21 +88,43 @@ public class ChoiceController {
             )
         }
     )
-    public ChoiceEntity getChoiceEntity(@PathVariable int id) {
-        return choiceService.getChoiceEntity(id);
+    public ResponseEntity<ChoiceEntity> getChoiceEntity(@PathVariable int id) {
+        ChoiceEntity choice = choiceServ.getChoiceEntity(id);
+        return ResponseEntity.ok().body(choice);
+    }
+
+    // Read all choices for question
+    @GetMapping("/questions/{questionId}")
+    @Operation(
+        summary = "Get all choices for a question",
+        description = "Retrieves all choices associated with a specific question",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Question not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<List<ChoiceEntity>> getChoicesForQuestion(@PathVariable int questionId) {
+        List<ChoiceEntity> choices = choiceServ.getChoicesForQuestion(questionId);
+        return ResponseEntity.ok().body(choices);
     }
 
     // Update
     @PutMapping("/{id}")
     @Operation(
-        description = "Update a choice",
+        summary = "Update a choice",
+        description = "Updates an existing choice by its ID",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Choice data to update (with ID)",
+            description = "Updated choice data",
             content = @Content(schema = @Schema(implementation = ChoiceEntity.class))
         ),
         responses = {
             @ApiResponse(responseCode = "200", description = "Choice updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request",
+            @ApiResponse(responseCode = "400", description = "Invalid input",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(responseCode = "404", description = "Choice not found",
@@ -105,14 +135,16 @@ public class ChoiceController {
             )
         }
     )
-    public ChoiceEntity putChoiceEntity(@PathVariable int id, @RequestBody ChoiceEntity newChoice) {
-        return choiceService.putChoiceEntity(id, newChoice);
+    public ResponseEntity<ChoiceEntity> putChoiceEntity(@PathVariable int id, @RequestBody ChoiceEntity newChoice) {
+        ChoiceEntity putChoice = choiceServ.putChoiceEntity(id, newChoice);
+        return ResponseEntity.ok().body(putChoice);
     }
 
     // Delete
     @DeleteMapping("/{id}")
     @Operation(
-        description = "Delete a choice by ID",
+        summary = "Delete a choice",
+        description = "Deletes a choice by its ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "Choice deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Choice not found",
@@ -123,8 +155,34 @@ public class ChoiceController {
             )
         }
     )
-    public String deleteChoiceEntity(@PathVariable int id) {
-        return choiceService.deleteChoiceEntity(id);
+    public ResponseEntity<String> deleteChoiceEntity(@PathVariable int id) {
+        String result = choiceServ.deleteChoiceEntity(id);
+        return ResponseEntity.ok().body(result);
+    }
+
+    // Validate user's choices for translation game
+    @PostMapping("/questions/{questionId}/validate-translation")
+    @Operation(
+        summary = "Validate user's choices for translation game",
+        description = "Validates if the user's selected choices are in the correct order for the translation game",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "List of choice IDs selected by the user",
+            content = @Content(schema = @Schema(implementation = List.class))
+        ),
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Validation result"),
+            @ApiResponse(responseCode = "404", description = "Question not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:create')")
+    public ResponseEntity<Boolean> validateTranslationGame(@PathVariable int questionId, @RequestBody List<Integer> userSelectedChoiceIds) {
+        boolean isCorrect = choiceServ.validateTranslationGame(questionId, userSelectedChoiceIds);
+        return ResponseEntity.ok().body(isCorrect);
     }
 }
 

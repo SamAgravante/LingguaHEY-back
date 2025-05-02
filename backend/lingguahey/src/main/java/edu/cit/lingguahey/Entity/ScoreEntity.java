@@ -1,5 +1,8 @@
 package edu.cit.lingguahey.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,9 +23,11 @@ public class ScoreEntity {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference(value = "user-scores")
     private UserEntity user;
 
-    @OneToOne(mappedBy = "score")
+    @OneToOne(mappedBy = "score", cascade = CascadeType.ALL)
+    @JsonBackReference(value = "question-score")
     private QuestionEntity question;
 
     public ScoreEntity(){

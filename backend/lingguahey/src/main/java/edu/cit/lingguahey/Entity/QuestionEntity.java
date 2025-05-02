@@ -2,6 +2,10 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,23 +30,20 @@ public class QuestionEntity {
     @Column(name = "question_image", columnDefinition = "MEDIUMBLOB", nullable = true)
     private byte[] questionImage;
 
-    //Relations
-    @ManyToOne
-    @JoinColumn(name = "activity_id")
-    private LiveActivityEntity activities;
-
-    @ManyToOne
-    @JoinColumn(name = "lesson_id")
-    private LessonActivityEntity lessons;
-
-    @OneToOne
-    @JoinColumn(name = "score_id")
-    private ScoreEntity score;
-
     @OneToMany(mappedBy = "question")
+    @JsonManagedReference(value = "question-choices")
     private List<ChoiceEntity> choices;
 
-    //Constructor, Getter, Setters
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "score_id")
+    @JsonManagedReference(value = "question-score")
+    private ScoreEntity score;
+
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
+    @JsonBackReference(value = "activity-questions")
+    private LessonActivityEntity activity;
+
     public QuestionEntity(){
         super();
     }
@@ -97,24 +98,12 @@ public class QuestionEntity {
         this.score = score;
     }
 
-    public LiveActivityEntity getActivity() {
-        return activities;
+    public LessonActivityEntity getActivity() {
+        return activity;
     }
 
-    public void setActivity(LiveActivityEntity activities) {
-        this.activities = activities;
-    }
-
-    public LessonActivityEntity getLesson() {
-        return lessons;
-    }
-
-    public void setLesson(LessonActivityEntity lessons) {
-        this.lessons = lessons;
-    }
-
-    public void setQuestionId(int questionId) {
-        this.questionId = questionId;
+    public void setActivity(LessonActivityEntity activity) {
+        this.activity = activity;
     }
    
 }

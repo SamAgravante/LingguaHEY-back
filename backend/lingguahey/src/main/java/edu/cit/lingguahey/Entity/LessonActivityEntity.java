@@ -2,53 +2,59 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 //import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-//import jakarta.persistence.EnumType;
-//import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-//import jakarta.persistence.ManyToMany;
-//import jakarta.persistence.OneToMany;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 
 @Entity
 public class LessonActivityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lesson_id")
-    private int lessonID;
+    @Column(name = "activity_id")
+    private int activityId;
 
     private String lessonName;
-    private String category;
-    private boolean isCompleted; // e add pa ni sa ERD
+    private boolean isCompleted;
 
-    //Relations
-    @ManyToOne
-    @JoinColumn(name = "classroom_id")
-    private ClassroomEntity lessonClassroom;
+    @Enumerated(EnumType.STRING)
+    private GameType gameType;
 
-    @OneToMany(mappedBy = "lessons")
+    @OneToMany(mappedBy = "activity")
+    @JsonManagedReference(value = "activity-questions")
     private List<QuestionEntity> questions;
 
-    //Constructors Getter Setters
+    @ManyToMany(mappedBy = "activities")
+    //@JsonBackReference
+    @JsonIgnore
+    private List<UserEntity> users;
+
+    public enum GameType {
+        GAME1, GAME2, GAME3
+    }
+
     public LessonActivityEntity(){
         super();
     }
 
-    public LessonActivityEntity(String lessonName, String category, boolean isCompleted) {
+    public LessonActivityEntity(String lessonName, boolean isCompleted, GameType gameType) {
         this.lessonName = lessonName;
-        this.category = category;
         this.isCompleted = isCompleted;
+        this.gameType = gameType;
     }
 
-    public int getLessonID() {
-        return lessonID;
+    public int getActivityId() {
+        return activityId;
     }
 
     public String getLessonName() {
@@ -67,15 +73,14 @@ public class LessonActivityEntity {
         this.isCompleted = isCompleted;
     }
 
-    public String getCategory() {
-        return category;
+    public GameType getGameType() {
+        return gameType;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
     }
 
-    /* 
     public List<QuestionEntity> getQuestions() {
         return questions;
     }
@@ -91,6 +96,5 @@ public class LessonActivityEntity {
     public void setUsers(List<UserEntity> users) {
         this.users = users;
     }
-    */
 
 }
