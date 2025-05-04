@@ -2,6 +2,7 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -14,7 +15,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
 @Entity
@@ -33,6 +36,11 @@ public class LessonActivityEntity {
     @OneToMany(mappedBy = "activity")
     @JsonManagedReference(value = "activity-questions")
     private List<QuestionEntity> questions;
+
+    @ManyToOne
+    @JoinColumn(name = "classroom_id")
+    @JsonBackReference(value = "classroom-activities")
+    private ClassroomEntity lessonClassroom;
 
     @ManyToMany(mappedBy = "activities")
     //@JsonBackReference

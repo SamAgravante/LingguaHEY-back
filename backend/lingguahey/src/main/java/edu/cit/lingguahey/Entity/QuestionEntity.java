@@ -44,6 +44,11 @@ public class QuestionEntity {
     @JsonBackReference(value = "activity-questions")
     private LessonActivityEntity activity;
 
+    @ManyToOne
+    @JoinColumn(name = "live_activity_id")
+    @JsonBackReference(value = "liveactivity-questions")
+    private LiveActivityEntity liveActivity;
+
     public QuestionEntity(){
         super();
     }
