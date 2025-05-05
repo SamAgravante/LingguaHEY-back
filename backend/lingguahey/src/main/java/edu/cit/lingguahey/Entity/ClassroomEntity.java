@@ -2,6 +2,7 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -24,6 +25,7 @@ public class ClassroomEntity {
 
     // Connections
     @OneToMany(mappedBy = "classroom")
+    @JsonManagedReference(value = "classroom-users")
     private List<UserEntity> users;
 
     @OneToMany(mappedBy = "lessonClassroom")
@@ -36,6 +38,7 @@ public class ClassroomEntity {
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @JsonBackReference(value = "classroom-teacher")
     private UserEntity teacher;
 
     // Constructors and Getter Setter

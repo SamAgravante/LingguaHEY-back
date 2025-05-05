@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -88,6 +89,7 @@ public class UserEntity implements UserDetails {
     //Entity Relations
     @ManyToOne
     @JoinColumn(name = "classroom_id")
+    @JsonBackReference(value = "classroom-users")
     private ClassroomEntity classroom;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -95,6 +97,7 @@ public class UserEntity implements UserDetails {
     private List<ScoreEntity> scores;
 
     @OneToMany(mappedBy = "teacher")
+    @JsonManagedReference(value = "classroom-teacher")
     private List<ClassroomEntity> classrooms;
 
     @ManyToMany
