@@ -1,8 +1,10 @@
 package edu.cit.lingguahey.Service;
 
 import edu.cit.lingguahey.Entity.ClassroomEntity;
+import edu.cit.lingguahey.Entity.ClassroomUser;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
+import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -14,12 +16,16 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class ClassroomService {
 
     @Autowired
     private ClassroomRepository classroomRepo;
+
+    @Autowired
+    private ClassroomUserRepository classroomUserRepo;
     
     @Autowired
     private UserRepository userRepo;
@@ -53,6 +59,8 @@ public class ClassroomService {
 
         return classroom;
     }
+
+    
 
     // Update
     public ClassroomEntity putClassroomEntity(int classroomId, ClassroomEntity newClassroom) {
@@ -89,13 +97,27 @@ public class ClassroomService {
         UserEntity student = userRepo.findById(studentId)
             .orElseThrow(() -> new EntityNotFoundException("Student not found"));
 
-        if (classroom.getUsers().contains(student)) {
+        Optional<ClassroomUser> existingAssignment = classroomUserRepo.findByClassroom_ClassroomIDAndUser_UserId(classroomId, studentId);
+        if (existingAssignment.isPresent()) {
             return "Student is already in this classroom!";
         }
 
-        classroom.getUsers().add(student);
-        classroomRepo.save(classroom);
+        ClassroomUser classroomUser = new ClassroomUser();
+        classroomUser.setClassroom(classroom);
+        classroomUser.setUser(student);
+        classroomUserRepo.save(classroomUser);
 
         return "Student added successfully to the classroom!";
+    }
+
+    // Read all students for a classroom
+    public List<UserEntity> getAllStudentsForClassroom(int classroomId) {
+        classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+    
+        return classroomUserRepo.findByClassroom_ClassroomID(classroomId)
+            .stream()
+            .map(ClassroomUser::getUser)
+            .toList();
     }
 }

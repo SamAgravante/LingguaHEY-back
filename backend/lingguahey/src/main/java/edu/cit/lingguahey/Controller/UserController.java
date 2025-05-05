@@ -68,7 +68,7 @@ public class UserController {
         }
     )
     // access
-    @PreAuthorize("hasAuthority('admin:read')")
+    @PreAuthorize("hasAuthority('admin:read') or hasAuthority('teacher:read')")
     public List<UserEntity> getAllUserEntity(){
         return userServ.getAllUserEntity();
     }
@@ -89,7 +89,7 @@ public class UserController {
         }
     )
     // access
-    @PreAuthorize("#id == principal.userId or hasAuthority('admin:read')")
+    @PreAuthorize("#id == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
     public UserEntity getUserEntity(@PathVariable int id){
         return userServ.getUserEntity(id);
     }
