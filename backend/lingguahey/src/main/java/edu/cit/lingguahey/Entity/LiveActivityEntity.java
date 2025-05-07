@@ -2,7 +2,7 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 //import java.util.List;
@@ -25,7 +25,7 @@ public class LiveActivityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "activity_id")
-    private int activityID;
+    private int activityId;
 
     private String activityName;
     private boolean isDeployed; // e add pa ni sa ERD
@@ -33,25 +33,30 @@ public class LiveActivityEntity {
     //Connections
     @ManyToOne
     @JoinColumn(name = "classroom_id")
-    @JsonBackReference(value = "classroom-liveactivities")
+    //@JsonBackReference(value = "classroom-liveactivities")
+    @JsonIgnore
     private ClassroomEntity activityClassroom;
 
     @OneToMany(mappedBy = "liveActivity")
     @JsonManagedReference(value = "liveactivity-questions")
     private List<QuestionEntity> questions;
 
+    @OneToMany(mappedBy = "liveActivity")
+    @JsonManagedReference(value = "live-users")
+    private List<UserEntity> userActivities;
+
     //Constructors Getter Setters
     public LiveActivityEntity(){
         super();
     }
 
-    public LiveActivityEntity(String lessonName, boolean isDeployed) {
-        this.activityName = lessonName;
+    public LiveActivityEntity(String activityName, boolean isDeployed) {
+        this.activityName = activityName;
         this.isDeployed = isDeployed;
     }
 
-    public int getActivityID() {
-        return activityID;
+    public int getActivityId() {
+        return activityId;
     }
 
     public String getActivityName() {

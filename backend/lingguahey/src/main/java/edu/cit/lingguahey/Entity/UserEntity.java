@@ -110,6 +110,11 @@ public class UserEntity implements UserDetails {
     @JsonIgnore
     private List<LessonActivityEntity> activities;
 
+    @ManyToOne
+    @JoinColumn(name = "activity_id")
+    @JsonBackReference(value = "live-users")
+    private LiveActivityEntity liveActivity;
+
     public UserEntity(){
         super();
     }
@@ -140,7 +145,8 @@ public class UserEntity implements UserDetails {
     
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, String password,
             String idNumber, int totalPoints, boolean subscriptionStatus, byte[] profilePic, Role role, List<Token> tokens,
-            ClassroomEntity classroom, List<ScoreEntity> scores, List<ClassroomEntity> classrooms, List<LessonActivityEntity> activities) {
+            ClassroomEntity classroom, List<ScoreEntity> scores, List<ClassroomEntity> classrooms, List<LessonActivityEntity> activities,
+            LiveActivityEntity liveActivity) {
         this.userId = userId;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -157,6 +163,7 @@ public class UserEntity implements UserDetails {
         this.scores = scores;
         this.classrooms = classrooms;
         this.activities = activities;
+        this.liveActivity = liveActivity;
     }
 
     public int getUserId() {
