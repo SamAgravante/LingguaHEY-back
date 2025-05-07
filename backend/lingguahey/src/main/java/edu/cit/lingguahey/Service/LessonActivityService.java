@@ -6,9 +6,13 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.cit.lingguahey.Entity.ClassroomEntity;
+import edu.cit.lingguahey.Entity.ClassroomUser;
 import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.Repository.ClassroomRepository;
+import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.UserActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
@@ -22,17 +26,27 @@ public class LessonActivityService {
     private LessonActivityRepository activityRepo;
 
     @Autowired
+    private UserActivityRepository userActivityRepo;
+
+    @Autowired
     private UserRepository userRepo;
 
     @Autowired
-    private UserActivityRepository userActivityRepo;
+    private ClassroomRepository classroomRepo;
 
-    // Create and assign to users
-    public LessonActivityEntity postActivityEntity(LessonActivityEntity activity) {
+    @Autowired
+    private ClassroomUserRepository classroomUserRepo;
+
+    // Create and assign to classroom and users
+    public LessonActivityEntity postActivityEntity(LessonActivityEntity activity, int classroomId) {
+        ClassroomEntity classroom = classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+        activity.setLessonClassroom(classroom);
         LessonActivityEntity postActivity = activityRepo.save(activity);
-        
-        List<UserEntity> allUsers = userRepo.findAll();
-        for (UserEntity user : allUsers) {
+
+        List<ClassroomUser> classroomUsers = classroomUserRepo.findByClassroom_ClassroomID(classroomId);
+        for (ClassroomUser classroomUser : classroomUsers) {
+            UserEntity user = classroomUser.getUser();
             UserActivity userActivity = new UserActivity(user, postActivity);
             userActivityRepo.save(userActivity);
         }
@@ -56,6 +70,14 @@ public class LessonActivityService {
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
         return userActivityRepo.findByUser_UserId(userId);
+    }
+
+    // Read all activities for a classroom
+    public List<LessonActivityEntity> getAllActivitiesForClassroom(int classroomId) {
+        classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+
+        return activityRepo.findByLessonClassroom_ClassroomID(classroomId);
     }
 
     // Update

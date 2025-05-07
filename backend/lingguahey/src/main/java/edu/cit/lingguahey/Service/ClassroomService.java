@@ -7,6 +7,7 @@ import edu.cit.lingguahey.Repository.ClassroomRepository;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -85,6 +86,7 @@ public class ClassroomService {
     }
 
     // Add Student to Classroom
+    @Transactional
     public String addStudentToClassroom(int classroomId, int studentId) throws AccessDeniedException {
         UserEntity teacher = getCurrentUser();
         ClassroomEntity classroom = classroomRepo.findById(classroomId)

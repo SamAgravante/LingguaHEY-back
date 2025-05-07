@@ -105,4 +105,11 @@ public class LessonActivityEntity {
         this.users = users;
     }
 
+    public ClassroomEntity getLessonClassroom() {
+        return lessonClassroom;
+    }
+
+    public void setLessonClassroom(ClassroomEntity lessonClassroom) {
+        this.lessonClassroom = lessonClassroom;
+    }
 }

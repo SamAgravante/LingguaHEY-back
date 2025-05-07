@@ -1,13 +1,11 @@
 package edu.cit.lingguahey.auth;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import edu.cit.lingguahey.Entity.UserEntity;
-import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.config.JwtService;
 import edu.cit.lingguahey.token.Token;
@@ -16,9 +14,6 @@ import edu.cit.lingguahey.token.TokenType;
 
 @Service
 public class AuthenticationService {
-
-    @Autowired
-    private LessonActivityRepository activityRepo;
 
     private final UserRepository repository;
     private final TokenRepository tokenRepository;

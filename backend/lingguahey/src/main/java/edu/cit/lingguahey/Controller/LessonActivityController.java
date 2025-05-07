@@ -31,11 +31,11 @@ public class LessonActivityController {
     @Autowired
     LessonActivityService activityServ;
 
-    // Create and assign to users
-    @PostMapping("")
+    // Create and assign to classroom and users
+    @PostMapping("/classrooms/{classroomId}")
     @Operation(
         summary = "Create a new activity",
-        description = "Creates a new activity and assigns it to all users",
+        description = "Creates a new activity and assigns it to all users in the specified classroom",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Activity data to create (without ID)",
             content = @Content(schema = @Schema(implementation = LessonActivityEntity.class))
@@ -45,13 +45,16 @@ public class LessonActivityController {
             @ApiResponse(responseCode = "400", description = "Invalid input",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
+            @ApiResponse(responseCode = "404", description = "Classroom not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
         }
     )
-    public ResponseEntity<LessonActivityEntity> postActivityEntity(@RequestBody LessonActivityEntity activity) {
-        LessonActivityEntity postActivity = activityServ.postActivityEntity(activity);
+    public ResponseEntity<LessonActivityEntity> postActivityEntity(@RequestBody LessonActivityEntity activity, @PathVariable int classroomId) {
+        LessonActivityEntity postActivity = activityServ.postActivityEntity(activity, classroomId);
         return ResponseEntity.status(201).body(postActivity);
     }
 
@@ -111,6 +114,26 @@ public class LessonActivityController {
     public ResponseEntity<List<UserActivityProjection>> getAllActivitiesForUser(@PathVariable int userId) {
         List<UserActivityProjection> userActivities = activityServ.getAllActivitiesForUser(userId);
         return ResponseEntity.ok().body(userActivities);
+    }
+
+    // Read all activities for a classroom
+    @GetMapping("/{classroomId}/activities")
+    @Operation(
+        summary = "Get all activities for a classroom",
+        description = "Retrieves all activities assigned to a specific classroom by its ID",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "List of activities retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Classroom not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<List<LessonActivityEntity>> getAllActivitiesForClassroom(@PathVariable int classroomId) {
+        List<LessonActivityEntity> activities = activityServ.getAllActivitiesForClassroom(classroomId);
+        return ResponseEntity.ok().body(activities);
     }
 
     // Update
