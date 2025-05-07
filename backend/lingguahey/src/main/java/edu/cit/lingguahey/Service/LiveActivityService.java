@@ -95,6 +95,10 @@ public class LiveActivityService {
             LiveActivityEntity activity = activityRepo.findById(activityId).get();
             activity.setActivityName(newActivity.getActivityName());
             activity.setDeployed(newActivity.isDeployed());
+            activity.setGameType(newActivity.getGameType());
+            if (newActivity.getQuestions() != null) {
+                activity.setQuestions(newActivity.getQuestions());
+            }
             return activityRepo.save(activity);
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("Activity " + activityId + " not found!");

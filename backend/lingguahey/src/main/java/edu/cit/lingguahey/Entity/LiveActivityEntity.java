@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 //import jakarta.persistence.EnumType;
 //import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +32,9 @@ public class LiveActivityEntity {
     private String activityName;
     private boolean isDeployed; // e add pa ni sa ERD
 
+    @Enumerated(EnumType.STRING)
+    private GameType gameType;
+
     //Connections
     @ManyToOne
     @JoinColumn(name = "classroom_id")
@@ -45,14 +50,19 @@ public class LiveActivityEntity {
     @JsonManagedReference(value = "live-users")
     private List<UserEntity> userActivities;
 
+    public enum GameType {
+        GAME1, GAME2, GAME3
+    }
+
     //Constructors Getter Setters
     public LiveActivityEntity(){
         super();
     }
 
-    public LiveActivityEntity(String activityName, boolean isDeployed) {
+    public LiveActivityEntity(String activityName, boolean isDeployed, GameType gameType) {
         this.activityName = activityName;
         this.isDeployed = isDeployed;
+        this.gameType = gameType;
     }
 
     public int getActivityId() {
@@ -71,10 +81,17 @@ public class LiveActivityEntity {
         return isDeployed;
     }
 
-    public void setDeployed(boolean isCompleted) {
-        this.isDeployed = isCompleted;
+    public void setDeployed(boolean isDeployed) {
+        this.isDeployed = isDeployed;
     }
 
+    public GameType getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
+    }
 
     public List<QuestionEntity> getQuestions() {
         return questions;
