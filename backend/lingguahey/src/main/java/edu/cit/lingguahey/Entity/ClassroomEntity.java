@@ -2,6 +2,9 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -22,16 +25,20 @@ public class ClassroomEntity {
 
     // Connections
     @OneToMany(mappedBy = "classroom")
+    @JsonManagedReference(value = "classroom-users")
     private List<UserEntity> users;
 
     @OneToMany(mappedBy = "lessonClassroom")
+    @JsonManagedReference(value = "classroom-activities")
     private List<LessonActivityEntity> lessons;
 
     @OneToMany(mappedBy = "activityClassroom")
+    @JsonManagedReference(value = "classroom-liveactivities")
     private List<LiveActivityEntity> activities;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
+    @JsonBackReference(value = "classroom-teacher")
     private UserEntity teacher;
 
     // Constructors and Getter Setter

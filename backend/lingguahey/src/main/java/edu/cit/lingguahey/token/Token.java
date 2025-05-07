@@ -1,5 +1,7 @@
 package edu.cit.lingguahey.token;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import edu.cit.lingguahey.Entity.UserEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,5 +38,6 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference(value = "user-tokens")
     private UserEntity user;
 }

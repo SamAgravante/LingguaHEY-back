@@ -1,10 +1,13 @@
 package edu.cit.lingguahey.Service;
 
 import edu.cit.lingguahey.Entity.ClassroomEntity;
+import edu.cit.lingguahey.Entity.ClassroomUser;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
+import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,12 +17,16 @@ import org.springframework.stereotype.Service;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 public class ClassroomService {
 
     @Autowired
     private ClassroomRepository classroomRepo;
+
+    @Autowired
+    private ClassroomUserRepository classroomUserRepo;
     
     @Autowired
     private UserRepository userRepo;
@@ -54,6 +61,8 @@ public class ClassroomService {
         return classroom;
     }
 
+    
+
     // Update
     public ClassroomEntity putClassroomEntity(int classroomId, ClassroomEntity newClassroom) {
         try {
@@ -70,9 +79,47 @@ public class ClassroomService {
     public String deleteClassroomEntity(int classroomId) {
         if (classroomRepo.findById(classroomId) != null) {
             classroomRepo.deleteById(classroomId);
-            return "Choice " + classroomId + " deleted successfully!";
+            return "Classroom " + classroomId + " deleted successfully!";
         } else {
-            return "Choice " + classroomId + " not found!";
+            return "Classroom " + classroomId + " not found!";
         }
+    }
+
+    // Add Student to Classroom
+    @Transactional
+    public String addStudentToClassroom(int classroomId, int studentId) throws AccessDeniedException {
+        UserEntity teacher = getCurrentUser();
+        ClassroomEntity classroom = classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found"));
+
+        if (teacher.getRole().name().equals("TEACHER") && (classroom.getTeacher() == null || !(classroom.getTeacher().getUserId() == teacher.getUserId()))) {
+            throw new AccessDeniedException("You do not own this classroom");
+        }
+
+        UserEntity student = userRepo.findById(studentId)
+            .orElseThrow(() -> new EntityNotFoundException("Student not found"));
+
+        Optional<ClassroomUser> existingAssignment = classroomUserRepo.findByClassroom_ClassroomIDAndUser_UserId(classroomId, studentId);
+        if (existingAssignment.isPresent()) {
+            return "Student is already in this classroom!";
+        }
+
+        ClassroomUser classroomUser = new ClassroomUser();
+        classroomUser.setClassroom(classroom);
+        classroomUser.setUser(student);
+        classroomUserRepo.save(classroomUser);
+
+        return "Student added successfully to the classroom!";
+    }
+
+    // Read all students for a classroom
+    public List<UserEntity> getAllStudentsForClassroom(int classroomId) {
+        classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+    
+        return classroomUserRepo.findByClassroom_ClassroomID(classroomId)
+            .stream()
+            .map(ClassroomUser::getUser)
+            .toList();
     }
 }

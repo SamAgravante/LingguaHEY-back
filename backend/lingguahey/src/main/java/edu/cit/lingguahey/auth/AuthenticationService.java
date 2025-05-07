@@ -42,8 +42,13 @@ public class AuthenticationService {
             .password(passwordEncoder.encode(request.getPassword()))
             .idNumber(request.getIdNumber())
             .totalPoints(request.getTotalPoints())
+            .subscriptionStatus(request.isSubscriptionStatus())
             .role(request.getRole())
             .build();
+        //assign activities to user
+        //var allActivities = activityRepo.findAll();
+        //user.setActivities(allActivities);
+        
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         //save token to db for logout
