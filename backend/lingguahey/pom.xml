@@ -30,7 +30,7 @@
 		<java.version>17</java.version>
 	</properties>
 
-	<!-- For Google Cloud -->
+	<!-- For Google Cloud 1 -->
 	<dependencyManagement>
         <dependencies>
             <dependency>

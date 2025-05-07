@@ -41,9 +41,9 @@ public class TextToSpeechController {
     // Define a simple request body class
     public static class TextToSpeechRequest {
         private String text;
-        private String languageCode = "en-US"; // Default language
-        private SsmlVoiceGender ssmlGender = SsmlVoiceGender.NEUTRAL; // Default gender
-        private AudioEncoding audioEncoding = AudioEncoding.MP3; // Default encoding
+        private String languageCode = "fil-PH";
+        private SsmlVoiceGender ssmlGender = SsmlVoiceGender.FEMALE;
+        private AudioEncoding audioEncoding = AudioEncoding.MP3;
 
         public String getText() {
             return text;
