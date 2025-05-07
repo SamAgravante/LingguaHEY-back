@@ -80,4 +80,11 @@ public class UserService {
             return "User " +userId+ "not found!";
         }
     }
+
+    // Update Subscription Status
+    public void updateSubscriptionStatus(Integer userId, boolean subscriptionStatus) {
+        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        user.setSubscriptionStatus(subscriptionStatus);
+        userRepo.save(user);
+    }
 }

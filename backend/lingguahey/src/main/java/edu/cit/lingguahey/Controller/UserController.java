@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.UserEntity;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("api/lingguahey/users")
@@ -141,5 +143,38 @@ public class UserController {
     @PreAuthorize("#id == principal.userId or hasAuthority('admin:delete')")
     public String deleteUserEntity(@PathVariable int id){
         return userServ.deleteUserEntity(id);
+    }
+
+    // Update Subscription Status
+    @PutMapping("/update-subscription/{id}")
+    @Operation(
+        summary = "Update a subscription status",
+        description = "Updates the subscription status information by their ID",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "User data to update (with ID)",
+            content = @Content(schema = @Schema(implementation = UserEntity.class))
+        ),
+        responses = {
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#id == principal.userId or hasAuthority('admin:update')")
+    @Transactional
+    public String updateSubscriptionStatus(@PathVariable int id, @RequestParam boolean subscriptionStatus) {
+        try {
+            userServ.updateSubscriptionStatus(id, subscriptionStatus);
+            return "Subscription status updated successfully!";
+        } catch (Exception e) {
+            return "Error updating subscription status: " + e.getMessage();
+        }
     }
 }
