@@ -3,6 +3,7 @@ package edu.cit.lingguahey.Entity;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -33,7 +34,8 @@ public class ClassroomEntity {
     private List<LessonActivityEntity> lessons;
 
     @OneToMany(mappedBy = "activityClassroom")
-    @JsonManagedReference(value = "classroom-liveactivities")
+    //@JsonManagedReference(value = "classroom-liveactivities")
+    @JsonIgnore
     private List<LiveActivityEntity> activities;
 
     @ManyToOne
