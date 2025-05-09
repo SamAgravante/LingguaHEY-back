@@ -34,9 +34,6 @@ import static edu.cit.lingguahey.Entity.Permission.USER_READ;
 import static edu.cit.lingguahey.Entity.Permission.USER_UPDATE;
 import static edu.cit.lingguahey.Entity.Permission.USER_CREATE;
 
-//test
-import static edu.cit.lingguahey.Entity.Permission.USER_CREATE;
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

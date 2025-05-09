@@ -15,10 +15,7 @@
             "name": "LingguaheyApplication",
             "request": "launch",
             "mainClass": "edu.cit.lingguahey.LingguaheyApplication",
-            "projectName": "lingguahey",
-            "env": {
-                "GOOGLE_APPLICATION_CREDENTIALS": "C:\\Users\\samso\\Downloads\\service-account.json"
-            }
+            "projectName": "lingguahey"
         }
     ]
 }

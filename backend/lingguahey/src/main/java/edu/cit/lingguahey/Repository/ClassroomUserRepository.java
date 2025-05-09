@@ -12,4 +12,6 @@ import edu.cit.lingguahey.Entity.ClassroomUser;
 public interface ClassroomUserRepository extends JpaRepository<ClassroomUser, Integer> {
     Optional<ClassroomUser> findByClassroom_ClassroomIDAndUser_UserId(int classroomId, int userId);
     List<ClassroomUser> findByClassroom_ClassroomID(int classroomId);
+    Optional<ClassroomUser> findByUser_UserId(int userId);
+    void deleteByClassroom_ClassroomIDAndUser_UserId(int classroomId, int userId);
 }

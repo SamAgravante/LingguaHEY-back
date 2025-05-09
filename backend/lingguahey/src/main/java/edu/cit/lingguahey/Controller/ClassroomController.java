@@ -4,6 +4,8 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -148,11 +150,28 @@ public class ClassroomController {
             )
         }
     )
-    public String addStudentToClassroom(
-        @PathVariable int classroomId,
-        @PathVariable int studentId
-    ) throws AccessDeniedException {
+    public String addStudentToClassroom(@PathVariable int classroomId, @PathVariable int studentId) throws AccessDeniedException {
         return classroomService.addStudentToClassroom(classroomId, studentId);
+    }
+
+    // Remove User from Classroom
+    @DeleteMapping("/{classroomId}/students/{studentId}")
+    @Operation(
+        summary = "Remove a student from a classroom",
+        description = "Removes the association between a student and a classroom",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Student removed successfully"),
+            @ApiResponse(responseCode = "404", description = "Classroom or student not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<String> removeStudentFromClassroom(@PathVariable int classroomId, @PathVariable int studentId) throws AccessDeniedException {
+        String result = classroomService.removeStudentFromClassroom(classroomId, studentId);
+        return ResponseEntity.ok(result);
     }
 
     // Read all students for a classroom
@@ -171,6 +190,24 @@ public class ClassroomController {
     )
     public List<UserEntity> getAllStudentsForClassroom(@PathVariable int classroomId) {
         return classroomService.getAllStudentsForClassroom(classroomId);
+    }
+
+    // Find classroom by userId
+    @GetMapping("/user/{userId}")
+    @Operation(
+        summary = "Get classroom by user ID",
+        description = "Retrieves the classroom associated with a specific user by their ID",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Classroom retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Classroom not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read')")
+    public ResponseEntity<ClassroomEntity> getClassroomByUserId(@PathVariable int userId) {
+        ClassroomEntity classroom = classroomService.getClassroomByUserId(userId);
+        return ResponseEntity.ok(classroom);
     }
     
 }

@@ -112,6 +112,30 @@ public class ClassroomService {
         return "Student added successfully to the classroom!";
     }
 
+    // Remove User from Classroom
+    @Transactional
+    public String removeStudentFromClassroom(int classroomId, int studentId) throws AccessDeniedException {
+        UserEntity teacher = getCurrentUser();
+        ClassroomEntity classroom = classroomRepo.findById(classroomId)
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+
+        if (teacher.getRole().name().equals("TEACHER") && (classroom.getTeacher() == null || !(classroom.getTeacher().getUserId() == teacher.getUserId()))) {
+            throw new AccessDeniedException("You do not own this classroom");
+        }
+
+        userRepo.findById(studentId)
+            .orElseThrow(() -> new EntityNotFoundException("Student not found with ID: " + studentId));
+
+        Optional<ClassroomUser> classroomUser = classroomUserRepo.findByClassroom_ClassroomIDAndUser_UserId(classroomId, studentId);
+        if (classroomUser.isEmpty()) {
+            throw new EntityNotFoundException("Student is not assigned to this classroom");
+        }
+
+        classroomUserRepo.deleteByClassroom_ClassroomIDAndUser_UserId(classroomId, studentId);
+
+        return "Student with ID " + studentId + " removed from classroom with ID " + classroomId;
+    }
+
     // Read all students for a classroom
     public List<UserEntity> getAllStudentsForClassroom(int classroomId) {
         classroomRepo.findById(classroomId)
@@ -121,5 +145,12 @@ public class ClassroomService {
             .stream()
             .map(ClassroomUser::getUser)
             .toList();
+    }
+
+    // Find classroom by userId
+    public ClassroomEntity getClassroomByUserId(int userId) {
+        ClassroomUser classroomUser = classroomUserRepo.findByUser_UserId(userId)
+            .orElseThrow(() -> new EntityNotFoundException("No classroom found for user with ID: " + userId));
+        return classroomUser.getClassroom();
     }
 }

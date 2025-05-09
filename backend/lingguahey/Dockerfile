@@ -9,5 +9,7 @@ RUN mvn clean install -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 RUN apk update && apk upgrade
 COPY --from=build /app/target/*.jar ./lingguahey-aws.jar
+COPY service-account.json /app/service-account.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/service-account.json
 EXPOSE 8080
 CMD ["java", "-jar", "/lingguahey-aws.jar"]
