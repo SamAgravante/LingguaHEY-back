@@ -118,11 +118,11 @@ public class ScoreController {
         return ResponseEntity.ok().body(score);
     }
 
-    // Delete
+    // Delete a ScoreEntity by id
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete a score",
-        description = "Deletes a score by its ID",
+        description = "Deletes a score by its ID along with all associated user scores",
         responses = {
             @ApiResponse(responseCode = "200", description = "Score deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Score not found",
@@ -162,27 +162,6 @@ public class ScoreController {
         return ResponseEntity.ok().build();
     }
 
-    // Total Score for User
-    @GetMapping("/users/{userId}/total")
-    @Operation(
-        summary = "Get total score for a user",
-        description = "Calculates and retrieves the total score for a specific user",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "User not found",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            )
-        }
-    )
-    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read')")
-    public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
-        int totalScore = scoreService.getTotalScoreForUser(userId);
-        return ResponseEntity.ok().body(totalScore);
-    }
-
     // Give Score to User for Translation Game
     @PostMapping("/award/translation/questions/{questionId}/users/{userId}")
     @Operation(
@@ -210,4 +189,26 @@ public class ScoreController {
         scoreService.awardScoreToUserForTranslationGame(questionId, userId, userSelectedChoiceIds);
         return ResponseEntity.ok().build();
     }
+
+    // Total Score for User
+    @GetMapping("/users/{userId}/total")
+    @Operation(
+        summary = "Get total score for a user",
+        description = "Calculates and retrieves the total score for a specific user",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read')")
+    public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
+        int totalScore = scoreService.getTotalScoreForUser(userId);
+        return ResponseEntity.ok().body(totalScore);
+    }
+
 }

@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.cit.lingguahey.Entity.ChoiceEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
+import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,6 +23,9 @@ public class QuestionService {
 
     @Autowired
     private LessonActivityRepository activityRepo;
+
+    @Autowired
+    private ChoiceRepository choiceRepo;
 
     // Create
     /*public QuestionEntity postQuestionEntity(QuestionEntity question) {
@@ -81,13 +86,16 @@ public class QuestionService {
         }
     }
 
-    // Delete
+    // Delete a QuestionEntity by id
     public String deleteQuestionEntity(int questionId) {
         if (questionRepo.existsById(questionId)) {
+            List<ChoiceEntity> choices = choiceRepo.findByQuestion_QuestionId(questionId);
+            choiceRepo.deleteAll(choices);
+
             questionRepo.deleteById(questionId);
-            return "Question " + questionId + " deleted successfully!";
+            return "Question " + questionId + " and its associations deleted successfully!";
         } else {
-            return "Question " + questionId + " not found!";
+            throw new EntityNotFoundException("Question " + questionId + " not found!");
         }
     }
 }

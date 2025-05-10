@@ -140,11 +140,11 @@ public class QuestionController {
         return ResponseEntity.ok().body(putQuestion);
     }
 
-    // Delete
+    // Delete a QuestionEntity by id
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete a question",
-        description = "Deletes a question by its ID",
+        description = "Deletes a question by its ID along with all associated choices",
         responses = {
             @ApiResponse(responseCode = "200", description = "Question deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Question not found",

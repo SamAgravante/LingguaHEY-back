@@ -115,7 +115,7 @@ public class ClassroomController {
         return classroomService.putClassroomEntity(id, newClassroom);
     }
 
-    // Delete
+    // Delete a ClassroomEntity by id
     @DeleteMapping("/{id}")
     @Operation(
         description = "Delete a classroom by ID",

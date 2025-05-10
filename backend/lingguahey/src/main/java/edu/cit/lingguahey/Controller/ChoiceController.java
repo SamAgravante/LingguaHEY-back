@@ -140,7 +140,7 @@ public class ChoiceController {
         return ResponseEntity.ok().body(putChoice);
     }
 
-    // Delete
+    // Delete a ChoiceEntity by id
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete a choice",

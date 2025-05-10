@@ -67,13 +67,13 @@ public class ChoiceService {
         }
     }
 
-    // Delete
+    // Delete a ChoiceEntity by id
     public String deleteChoiceEntity(int choiceId) {
         if (choiceRepo.existsById(choiceId)) {
             choiceRepo.deleteById(choiceId);
             return "Choice " + choiceId + " deleted successfully!";
         } else {
-            return "Choice " + choiceId + " not found!";
+            throw new EntityNotFoundException("Choice " + choiceId + " not found!");
         }
     }
 

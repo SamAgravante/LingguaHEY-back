@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.ScoreEntity;
 import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.Entity.UserScore;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.ScoreRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.Repository.UserScoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -29,10 +31,8 @@ public class ScoreService {
     @Autowired
     private ChoiceService choiceServ;
 
-    // Create
-    /*public ScoreEntity postScoreEntity(ScoreEntity score) {
-        return scoreRepo.save(score);
-    }*/
+    @Autowired
+    private UserScoreRepository userScoreRepo;
 
     // Create and Add Score to Question
     public ScoreEntity setScoreForQuestion(int questionId, int scoreValue) {
@@ -84,13 +84,16 @@ public class ScoreService {
         return scoreRepo.save(score);
     }
 
-    // Delete
+    // Delete a ScoreEntity by id
     public String deleteScoreEntity(int scoreId) {
         if (scoreRepo.existsById(scoreId)) {
+            List<UserScore> userScores = userScoreRepo.findByScoreEntity_ScoreId(scoreId);
+            userScoreRepo.deleteAll(userScores);
+
             scoreRepo.deleteById(scoreId);
             return "Score " + scoreId + " deleted successfully!";
         } else {
-            return "Score " + scoreId + " not found!";
+            throw new EntityNotFoundException("Score " + scoreId + " not found!");
         }
     }
 
@@ -100,20 +103,20 @@ public class ScoreService {
             .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
         boolean isCorrectChoice = question.getChoices().stream()
             .anyMatch(choice -> choice.getChoiceId() == selectedChoiceId && choice.isCorrect());
         if (!isCorrectChoice) {
             throw new IllegalArgumentException("The selected choice is incorrect.");
         }
-        ScoreEntity score = question.getScore();
-        if (score == null) {
-            throw new EntityNotFoundException("No score found for the question with ID: " + questionId);
-        }
-        ScoreEntity userScore = new ScoreEntity();
-        userScore.setScore(score.getScore());
-        userScore.setQuestion(question);
-        userScore.setUser(user);
-        scoreRepo.save(userScore);
+
+        userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
+            .ifPresent(existing -> {
+                throw new IllegalStateException("User already has a score for this question.");
+            });
+
+        UserScore userScore = new UserScore(user, question, question.getScore().getScore());
+        userScoreRepo.save(userScore);
     }
 
     // Give Score to User for Translation Game
@@ -122,28 +125,28 @@ public class ScoreService {
             .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+    
         boolean isCorrectChoice = choiceServ.validateTranslationGame(questionId, choiceIds);
         if (!isCorrectChoice) {
             throw new IllegalArgumentException("The selected choices are not in the correct order.");
         }
-        ScoreEntity score = question.getScore();
-        if (score == null) {
-            throw new EntityNotFoundException("No score found for the question with ID: " + questionId);
-        }
-
-        ScoreEntity userScore = new ScoreEntity();
-        userScore.setScore(score.getScore());
-        userScore.setQuestion(question);
-        userScore.setUser(user);
-        scoreRepo.save(userScore);
+    
+        userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
+            .ifPresent(existing -> {
+                throw new IllegalStateException("User already has a score for this question.");
+            });
+    
+        UserScore userScore = new UserScore(user, question, question.getScore().getScore());
+        userScoreRepo.save(userScore);
     }
 
     // Total Score for User
+    @SuppressWarnings("unused")
     public int getTotalScoreForUser(int userId) {
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        return user.getScores().stream()
-            .mapToInt(ScoreEntity::getScore)
+        return userScoreRepo.findByUser_UserId(userId).stream()
+            .mapToInt(userScore -> userScore.getScore())
             .sum();
     }
 }

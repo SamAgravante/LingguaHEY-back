@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Service.LiveActivityService;
 import edu.cit.lingguahey.model.ClassroomActivityLiveProjection;
@@ -56,10 +57,7 @@ public class LiveActivityController {
             )
         }
     )
-    public ResponseEntity<LiveActivityEntity> postActivityEntity(
-        @RequestBody LiveActivityEntity activity,
-        @PathVariable int classroomId
-    ) {
+    public ResponseEntity<LiveActivityEntity> postActivityEntity(@RequestBody LiveActivityEntity activity, @PathVariable int classroomId) {
         LiveActivityEntity postActivity = activityServ.postActivityEntity(activity, classroomId);
         return ResponseEntity.status(201).body(postActivity);
     }
@@ -67,7 +65,8 @@ public class LiveActivityController {
     // Read All Activities
     @GetMapping("")
     @Operation(
-        description = "Get all activities",
+        summary = "Get all live activities",
+        description = "Retrieves a list of all live activities",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -75,14 +74,16 @@ public class LiveActivityController {
             )
         }
     )
-    public List<LiveActivityEntity> getAllActivityEntity() {
-        return activityServ.getAllActivityEntity();
+    public ResponseEntity<List<LiveActivityEntity>> getAllActivityEntity() {
+        List<LiveActivityEntity> activities = activityServ.getAllActivityEntity();
+        return ResponseEntity.ok().body(activities);
     }
 
     // Read Single Activity
     @GetMapping("/{id}")
     @Operation(
-        description = "Get an activity by ID",
+        summary = "Get a live activity by ID",
+        description = "Retrieves a specific live activity by its ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
             @ApiResponse(responseCode = "404", description = "Activity not found",
@@ -93,8 +94,9 @@ public class LiveActivityController {
             )
         }
     )
-    public LiveActivityEntity getActivityEntity(@PathVariable int id) {
-        return activityServ.getActivityEntity(id);
+    public ResponseEntity<LiveActivityEntity> getActivityEntity(@PathVariable int id) {
+        LiveActivityEntity activity = activityServ.getActivityEntity(id);
+        return ResponseEntity.ok().body(activity);
     }
 
     // Read all activities for a user
@@ -140,10 +142,15 @@ public class LiveActivityController {
     // Update
     @PutMapping("/{id}")
     @Operation(
-        description = "Update an activity",
+        summary = "Update a live activity",
+        description = "Updates an existing live activity by its ID",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Updated activity data",
+            content = @Content(schema = @Schema(implementation = LessonActivityEntity.class))
+        ),
         responses = {
             @ApiResponse(responseCode = "200", description = "Activity updated successfully"),
-            @ApiResponse(responseCode = "400", description = "Bad request",
+            @ApiResponse(responseCode = "400", description = "Invalid input",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(responseCode = "404", description = "Activity not found",
@@ -154,14 +161,16 @@ public class LiveActivityController {
             )
         }
     )
-    public LiveActivityEntity putActivityEntity(@PathVariable int id, @RequestBody LiveActivityEntity newActivity) {
-        return activityServ.putActivityEntity(id, newActivity);
+    public ResponseEntity<LiveActivityEntity> putActivityEntity(@PathVariable int id, @RequestBody LiveActivityEntity newActivity) {
+        LiveActivityEntity putActivity = activityServ.putActivityEntity(id, newActivity);
+        return ResponseEntity.ok().body(putActivity);
     }
 
-    // Delete
+    // Delete an ActivityEntity by id
     @DeleteMapping("/{id}")
     @Operation(
-        description = "Delete an activity by ID",
+        summary = "Delete an activity",
+        description = "Deletes an activity by its ID along with all associated user activities",
         responses = {
             @ApiResponse(responseCode = "200", description = "Activity deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Activity not found",
@@ -172,7 +181,8 @@ public class LiveActivityController {
             )
         }
     )
-    public String deleteActivityEntity(@PathVariable int id) {
-        return activityServ.deleteActivityEntity(id);
+    public ResponseEntity<String> deleteActivityEntity(@PathVariable int id) {
+        String result = activityServ.deleteActivityEntity(id);
+        return ResponseEntity.ok().body(result);
     }
 }

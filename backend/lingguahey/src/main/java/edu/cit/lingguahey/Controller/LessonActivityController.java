@@ -164,11 +164,11 @@ public class LessonActivityController {
         return ResponseEntity.ok().body(putActivity);
     }
 
-    // Delete
+    // Delete an ActivityEntity by id
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete an activity",
-        description = "Deletes an activity by its ID",
+        description = "Deletes an activity by its ID along with all associated user activities",
         responses = {
             @ApiResponse(responseCode = "200", description = "Activity deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Activity not found",
