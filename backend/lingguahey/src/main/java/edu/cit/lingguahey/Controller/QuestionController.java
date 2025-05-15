@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+//import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -114,7 +114,7 @@ public class QuestionController {
     }
 
     // Update
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     @Operation(
         summary = "Update a question",
         description = "Updates an existing question by its ID",
@@ -135,8 +135,13 @@ public class QuestionController {
             )
         }
     )
-    public ResponseEntity<QuestionEntity> putQuestionEntity(@PathVariable int id, @RequestBody QuestionEntity newQuestion) {
-        QuestionEntity putQuestion = questionServ.putQuestionEntity(id, newQuestion);
+    public ResponseEntity<QuestionEntity> putQuestionEntity(
+            @PathVariable int id,
+            @RequestParam String questionDescription,
+            @RequestParam String questionText,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
+        QuestionEntity putQuestion = questionServ.putQuestionEntity(id, questionDescription, questionText, image);
         return ResponseEntity.ok().body(putQuestion);
     }
 

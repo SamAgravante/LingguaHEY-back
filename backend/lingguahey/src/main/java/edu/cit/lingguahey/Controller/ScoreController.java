@@ -94,18 +94,17 @@ public class ScoreController {
         return ResponseEntity.ok().body(score);
     }
 
-    // Update
-    @PutMapping("/{id}")
+    @PutMapping("/questions/{questionId}/score")
     @Operation(
-        summary = "Update a score",
-        description = "Updates an existing score by its ID",
+        summary = "Update a score for a question",
+        description = "Updates the score for a specific question by its ID",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "Updated score data",
-            content = @Content(schema = @Schema(implementation = ScoreEntity.class))
+            description = "Score value to set",
+            content = @Content(schema = @Schema(implementation = Integer.class))
         ),
         responses = {
             @ApiResponse(responseCode = "200", description = "Score updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Score not found",
+            @ApiResponse(responseCode = "404", description = "Score or question not found",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -113,9 +112,11 @@ public class ScoreController {
             )
         }
     )
-    public ResponseEntity<ScoreEntity> putScoreEntity(@PathVariable int id, @RequestBody ScoreEntity newScore) {
-        ScoreEntity score = scoreService.putScoreEntity(id, newScore);
-        return ResponseEntity.ok().body(score);
+    public ResponseEntity<ScoreEntity> updateScoreForQuestion(
+            @PathVariable int questionId,
+            @RequestParam int scoreValue) {
+        ScoreEntity score = scoreService.updateScoreForQuestion(questionId, scoreValue);
+        return ResponseEntity.ok(score);
     }
 
     // Delete a ScoreEntity by id

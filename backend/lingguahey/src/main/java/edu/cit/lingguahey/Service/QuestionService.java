@@ -2,7 +2,6 @@ package edu.cit.lingguahey.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -68,21 +67,21 @@ public class QuestionService {
     }
 
     // Update
-    public QuestionEntity putQuestionEntity(int questionId, QuestionEntity newQuestion) {
+    public QuestionEntity putQuestionEntity(int questionId, String questionDescription, String questionText, MultipartFile image) {
         try {
-            QuestionEntity question = questionRepo.findById(questionId).get();
-            question.setQuestionDescription(newQuestion.getQuestionDescription());
-            question.setQuestionText(newQuestion.getQuestionText());
-            question.setQuestionImage(newQuestion.getQuestionImage());
-            if (newQuestion.getActivity() != null) {
-                question.setActivity(newQuestion.getActivity());
+            QuestionEntity question = questionRepo.findById(questionId)
+                .orElseThrow(() -> new EntityNotFoundException("Question " + questionId + " not found!"));
+
+            question.setQuestionDescription(questionDescription);
+            question.setQuestionText(questionText);
+
+            if (image != null && !image.isEmpty()) {
+                question.setQuestionImage(image.getBytes()); // Store image as byte[]
             }
-            if (newQuestion.getChoices() != null) {
-                question.setChoices(newQuestion.getChoices());
-            }
+
             return questionRepo.save(question);
-        } catch (NoSuchElementException e) {
-            throw new EntityNotFoundException("Question " + questionId + " not found!");
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read image bytes", e);
         }
     }
 
