@@ -164,4 +164,82 @@ public class QuestionController {
         String result = questionServ.deleteQuestionEntity(id);
         return ResponseEntity.ok().body(result);
     }
+
+
+    // Test Endpoints for live activity
+
+    // Create question for live activity
+    @PostMapping(value = "/liveactivities/{liveActivityId}", consumes = "multipart/form-data")
+    @Operation(
+        summary = "Create a question for a specific live activity with an image and game type",
+        description = "Creates a new question and associates it with a specific live activity, optionally uploading an image and specifying the game type",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Question created and added to live activity successfully"),
+            @ApiResponse(responseCode = "404", description = "Live Activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<QuestionEntity> postQuestionForLiveActivity(
+            @PathVariable int liveActivityId,
+            @RequestParam String questionDescription,
+            @RequestParam String questionText,
+            @RequestParam QuestionEntity.GameType gameType,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
+        QuestionEntity postQuestion = questionServ.postQuestionForLiveActivity(liveActivityId, questionDescription, questionText, gameType, image);
+        return ResponseEntity.status(201).body(postQuestion);
+    }
+
+    // Read all questions for live activity
+    @GetMapping("/liveactivities/{liveActivityId}")
+    @Operation(
+        summary = "Get all questions for a live activity",
+        description = "Retrieves all questions associated with a specific live activity",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Live Activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<List<QuestionEntity>> getQuestionsForLiveActivity(@PathVariable int liveActivityId) {
+        List<QuestionEntity> questions = questionServ.getQuestionsForLiveActivity(liveActivityId);
+        return ResponseEntity.ok().body(questions);
+    }
+
+    // Update question for live activity
+    @PutMapping(value = "/liveactivities/{questionId}", consumes = "multipart/form-data")
+    @Operation(
+        summary = "Update a question for a live activity",
+        description = "Updates an existing question for a live activity by its ID",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Question updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Question not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<QuestionEntity> putQuestionEntityLive(
+            @PathVariable int questionId,
+            @RequestParam String questionDescription,
+            @RequestParam String questionText,
+            @RequestParam QuestionEntity.GameType gameType,
+            @RequestParam(value = "image", required = false) MultipartFile image
+    ) {
+        QuestionEntity putQuestion = questionServ.putQuestionEntityLive(questionId, questionDescription, questionText, gameType, image);
+        return ResponseEntity.ok().body(putQuestion);
+    }
 }

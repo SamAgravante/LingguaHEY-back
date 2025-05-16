@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,6 +28,10 @@ public class QuestionEntity {
 
     private String questionDescription;
     private String questionText;
+
+    @Enumerated(EnumType.STRING)
+    private GameType gameType;
+
     @Lob
     @Column(name = "question_image", columnDefinition = "MEDIUMBLOB", nullable = true)
     private byte[] questionImage;
@@ -49,14 +55,19 @@ public class QuestionEntity {
     @JsonBackReference(value = "liveactivity-questions")
     private LiveActivityEntity liveActivity;
 
+    public enum GameType {
+        GAME1, GAME2, GAME3
+    }
+
     public QuestionEntity(){
         super();
     }
 
-    public QuestionEntity(String questionDescription, String questionText, byte[] questionImage) {
+    public QuestionEntity(String questionDescription, String questionText, byte[] questionImage, GameType gameType) {
         this.questionDescription = questionDescription;
         this.questionText = questionText;
         this.questionImage = questionImage;
+        this.gameType = gameType;
     }
 
     public int getQuestionId() {
@@ -110,5 +121,20 @@ public class QuestionEntity {
     public void setActivity(LessonActivityEntity activity) {
         this.activity = activity;
     }
-   
+
+    public GameType getGameType() {
+        return gameType;
+    }
+
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
+    }
+
+    public LiveActivityEntity getLiveActivity() {
+        return liveActivity;
+    }
+
+    public void setLiveActivity(LiveActivityEntity liveActivity) {
+        this.liveActivity = liveActivity;
+    }
 }
