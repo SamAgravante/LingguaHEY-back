@@ -13,6 +13,7 @@ import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.Entity.LessonActivityEntity.GameType;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
@@ -20,6 +21,7 @@ import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.UserActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.model.ActivityProgressDTO;
 import edu.cit.lingguahey.model.UserActivityProjection;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -137,6 +139,37 @@ public class LessonActivityService {
             .orElseThrow(() -> new EntityNotFoundException("Activity not assigned to user"));
         userActivity.setCompleted(true);
         userActivityRepo.save(userActivity);
+    }
+
+    // Progress tracker for user
+    public ActivityProgressDTO getUserProgress(int userId) {
+        List<UserActivityProjection> userActivities = userActivityRepo.findByUser_UserId(userId);
+        if (userActivities.isEmpty()) {
+            throw new EntityNotFoundException("No activities found for user: " + userId);
+        }
+
+        int gameSet1Total = 0;
+        int gameSet1Completed = 0;
+        int gameSet2Total = 0;
+        int gameSet2Completed = 0;
+
+        for (UserActivityProjection ua : userActivities) {
+            GameType gameType = ua.getActivity_GameType();
+            boolean completed = ua.isCompleted();
+
+            if ("GAME1".equals(gameType.toString()) || "GAME3".equals(gameType.toString())) {
+                gameSet1Total++;
+                if (completed) gameSet1Completed++;
+            } else if ("GAME2".equals(gameType.toString())) {
+                gameSet2Total++;    
+                if (completed) gameSet2Completed++;
+            }
+        }
+
+        ActivityProgressDTO progress = new ActivityProgressDTO();
+        progress.setGameSet1Progress(gameSet1Total == 0 ? 0 : (double) gameSet1Completed / gameSet1Total);
+        progress.setGameSet2Progress(gameSet2Total == 0 ? 0 : (double) gameSet2Completed / gameSet2Total);
+        return progress;
     }
 }
 

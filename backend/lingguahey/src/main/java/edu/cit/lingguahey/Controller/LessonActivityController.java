@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Service.LessonActivityService;
+import edu.cit.lingguahey.model.ActivityProgressDTO;
 import edu.cit.lingguahey.model.ErrorResponse;
 import edu.cit.lingguahey.model.UserActivityProjection;
 import io.swagger.v3.oas.annotations.Operation;
@@ -203,5 +204,26 @@ public class LessonActivityController {
     public ResponseEntity<Void> markActivityAsCompleted(@PathVariable int id, @PathVariable int userId) {
         activityServ.markActivityAsCompleted(userId, id);
         return ResponseEntity.ok().build();
+    }
+
+    // Progress tracker for user
+    @GetMapping("/{userId}/progress")
+    @Operation(
+        summary = "Get user progress",
+        description = "Returns progress for grouped game types (GAME_1 + GAME_2) and GAME_3 separately",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Progress data"),
+            @ApiResponse(responseCode = "404", description = "User or activities not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read')")
+    public ResponseEntity<ActivityProgressDTO> getUserProgress(@PathVariable int userId) {
+        ActivityProgressDTO progress = activityServ.getUserProgress(userId);
+        return ResponseEntity.ok(progress);
     }
 }
