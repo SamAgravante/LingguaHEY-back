@@ -3,6 +3,7 @@ package edu.cit.lingguahey.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Service.UserService;
 import edu.cit.lingguahey.model.ErrorResponse;
+import edu.cit.lingguahey.model.PasswordResetRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/lingguahey/users")
@@ -176,5 +179,31 @@ public class UserController {
         } catch (Exception e) {
             return "Error updating subscription status: " + e.getMessage();
         }
+    }
+
+    @PutMapping("/{id}/reset-password")
+    @Operation(
+        summary = "Reset a user's password",
+        description = "Verifies the old password and, if correct, updates to the new password",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "JSON with oldPassword and newPassword",
+            required = true,
+            content = @Content(schema = @Schema(implementation = PasswordResetRequest.class))
+        ),
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Password reset successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid payload or old password incorrect",
+                content = @Content(schema = @Schema())),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema()))
+        }
+    )
+    @PreAuthorize("#id == principal.userId or hasAuthority('admin:update')")
+    public ResponseEntity<Void> resetPassword(
+            @PathVariable("id") int id,
+            @Valid @RequestBody PasswordResetRequest payload) {
+
+        userServ.resetPassword(id, payload.getOldPassword(), payload.getNewPassword());
+        return ResponseEntity.ok().build();
     }
 }

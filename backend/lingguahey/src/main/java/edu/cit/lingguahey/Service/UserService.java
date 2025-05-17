@@ -87,4 +87,21 @@ public class UserService {
         user.setSubscriptionStatus(subscriptionStatus);
         userRepo.save(user);
     }
+
+    // Password Reset
+    public void resetPassword(int userId, String oldPassword, String newPassword) {
+        UserEntity user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User " + userId + " not found!"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("New password must be different from the old password");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepo.save(user);
+    }
 }

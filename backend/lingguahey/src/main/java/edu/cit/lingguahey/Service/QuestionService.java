@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import edu.cit.lingguahey.Entity.ChoiceEntity;
-import edu.cit.lingguahey.Entity.LiveActivityEntity;
+//import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.LessonActivityRepository;
