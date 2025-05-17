@@ -77,7 +77,7 @@ public class ClassroomController {
         description = "Get a classroom by ID",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "Choice not found",
+            @ApiResponse(responseCode = "404", description = "Classroom not found",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -91,6 +91,19 @@ public class ClassroomController {
 
     // Read by Teacher ID
     @GetMapping("/teacher/{teacherId}")
+    @Operation(
+        summary = "Get all classrooms by teacher ID",
+        description = "Retrieve all classrooms for a teacher ID",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Classroom not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
     @PreAuthorize("#teacherId == principal.userId or hasAuthority('admin:read')")
     public ResponseEntity<List<ClassroomEntity>> getClassroomsByTeacher(@PathVariable int teacherId) {
         List<ClassroomEntity> classrooms = classroomService.getClassroomByTeacherId(teacherId);
