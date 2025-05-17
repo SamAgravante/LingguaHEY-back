@@ -27,8 +27,10 @@ public class LessonActivityEntity {
     @Column(name = "activity_id")
     private int activityId;
 
-    private String lessonName;
+    private int topicNumber;
     private boolean isCompleted;
+    private int lessonNumber;
+    private String lessonName;
 
     @Enumerated(EnumType.STRING)
     private GameType gameType;
@@ -55,9 +57,11 @@ public class LessonActivityEntity {
         super();
     }
 
-    public LessonActivityEntity(String lessonName, boolean isCompleted, GameType gameType) {
-        this.lessonName = lessonName;
+    public LessonActivityEntity(int topicNumber, boolean isCompleted, int lessonNumber, String lessonName, GameType gameType) {
+        this.topicNumber = topicNumber;
         this.isCompleted = isCompleted;
+        this.lessonNumber = lessonNumber;
+        this.lessonName = lessonName;
         this.gameType = gameType;
     }
 
@@ -65,12 +69,12 @@ public class LessonActivityEntity {
         return activityId;
     }
 
-    public String getLessonName() {
-        return lessonName;
+    public int getTopicNumber() {
+        return topicNumber;
     }
 
-    public void setLessonName(String activityName) {
-        this.lessonName = activityName;
+    public void setTopicNumber(int topicNumber) {
+        this.topicNumber = topicNumber;
     }
 
     public boolean isCompleted() {
@@ -79,6 +83,22 @@ public class LessonActivityEntity {
 
     public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
+    }
+
+    public int getLessonNumber() {
+        return lessonNumber;
+    }
+
+    public void setLessonNumber(int lessonNumber) {
+        this.lessonNumber = lessonNumber;
+    }
+
+    public String getLessonName() {
+        return lessonName;
+    }
+
+    public void setLessonName(String lessonName) {
+        this.lessonName = lessonName;
     }
 
     public GameType getGameType() {

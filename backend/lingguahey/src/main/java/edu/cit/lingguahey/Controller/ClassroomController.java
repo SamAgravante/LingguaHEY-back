@@ -89,6 +89,14 @@ public class ClassroomController {
         return classroomService.getClassroomEntity(id);
     }
 
+    // Read by Teacher ID
+    @GetMapping("/teacher/{teacherId}")
+    @PreAuthorize("#teacherId == principal.userId or hasAuthority('admin:read')")
+    public ResponseEntity<List<ClassroomEntity>> getClassroomsByTeacher(@PathVariable int teacherId) {
+        List<ClassroomEntity> classrooms = classroomService.getClassroomByTeacherId(teacherId);
+        return ResponseEntity.ok(classrooms);
+    }
+
     // Update
     @PutMapping("/{id}")
     @Operation(

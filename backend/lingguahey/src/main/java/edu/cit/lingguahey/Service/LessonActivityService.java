@@ -94,8 +94,10 @@ public class LessonActivityService {
     public LessonActivityEntity putActivityEntity(int activityId, LessonActivityEntity newActivity) {
         try {
             LessonActivityEntity activity = activityRepo.findById(activityId).get();
-            activity.setLessonName(newActivity.getLessonName());
+            activity.setTopicNumber(newActivity.getTopicNumber());
             activity.setCompleted(newActivity.isCompleted());
+            activity.setLessonNumber(newActivity.getLessonNumber());
+            activity.setLessonName(newActivity.getLessonName());
             activity.setGameType(newActivity.getGameType());
             if (newActivity.getQuestions() != null) {
                 activity.setQuestions(newActivity.getQuestions());

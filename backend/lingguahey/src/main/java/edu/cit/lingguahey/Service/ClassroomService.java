@@ -96,7 +96,10 @@ public class ClassroomService {
         return classroom;
     }
 
-    
+    // Read by Teacher ID
+    public List<ClassroomEntity> getClassroomByTeacherId(int teacherId) {
+        return classroomRepo.findByTeacherUserId(teacherId);
+    }
 
     // Update
     public ClassroomEntity putClassroomEntity(int classroomId, ClassroomEntity newClassroom) {
