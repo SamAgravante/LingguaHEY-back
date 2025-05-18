@@ -46,15 +46,6 @@ public class LiveActivityEntity {
     @JsonManagedReference(value = "live-users")
     private List<UserEntity> userActivities;
 
-    @OneToMany
-    @JoinTable(
-        name = "lobby_users",
-        joinColumns = @JoinColumn(name = "activity_id"),
-        inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    @JsonIgnore
-    private List<UserEntity> lobbyUsers = new ArrayList<>();
-
     public enum GameType {
         GAME1, GAME2, GAME3
     }
@@ -113,15 +104,7 @@ public class LiveActivityEntity {
     public void setClassroom(ClassroomEntity classroom) {
         this.activityClassroom = classroom;
     }
-
-    public List<UserEntity> getLobbyUsers() {
-        return lobbyUsers;
-    }
-
-    public void setLobbyUsers(List<UserEntity> lobbyUsers) {
-        this.lobbyUsers = lobbyUsers;
-    }
-
+    
     public void setUserActivities(List<UserEntity> userActivities) {
         this.userActivities = userActivities;
     }
