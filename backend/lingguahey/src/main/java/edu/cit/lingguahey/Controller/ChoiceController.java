@@ -50,7 +50,7 @@ public class ChoiceController {
             )
         }
     )
-    @PreAuthorize("hasAuthority('admin:create')")
+    @PreAuthorize("hasAuthority('admin:create') or hasAuthority('teacher:create')")
     public ResponseEntity<ChoiceEntity> postChoiceForQuestion(@PathVariable int questionId, @RequestBody ChoiceEntity choice) {
         ChoiceEntity postChoice = choiceServ.postChoiceForQuestion(questionId, choice);
         return ResponseEntity.status(201).body(postChoice);
