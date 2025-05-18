@@ -51,7 +51,7 @@ public class ScoreController {
             )
         }
     )
-    @PreAuthorize("hasAuthority('admin:create')")
+    @PreAuthorize("hasAuthority('admin:create') or hasAuthority('teacher:create')")
     public ResponseEntity<ScoreEntity> setScoreForQuestion(@PathVariable int questionId, @RequestParam int scoreValue) {
         ScoreEntity postScore = scoreService.setScoreForQuestion(questionId, scoreValue);
         return ResponseEntity.status(201).body(postScore);
