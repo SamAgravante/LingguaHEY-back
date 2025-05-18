@@ -1,24 +1,20 @@
 package edu.cit.lingguahey.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-//import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-//import jakarta.persistence.EnumType;
-//import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-//import jakarta.persistence.ManyToMany;
-//import jakarta.persistence.OneToMany;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 
@@ -49,6 +45,15 @@ public class LiveActivityEntity {
     @OneToMany(mappedBy = "liveActivity")
     @JsonManagedReference(value = "live-users")
     private List<UserEntity> userActivities;
+
+    @OneToMany
+    @JoinTable(
+        name = "lobby_users",
+        joinColumns = @JoinColumn(name = "activity_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    @JsonIgnore
+    private List<UserEntity> lobbyUsers = new ArrayList<>();
 
     public enum GameType {
         GAME1, GAME2, GAME3
@@ -107,5 +112,17 @@ public class LiveActivityEntity {
 
     public void setClassroom(ClassroomEntity classroom) {
         this.activityClassroom = classroom;
+    }
+
+    public List<UserEntity> getLobbyUsers() {
+        return lobbyUsers;
+    }
+
+    public void setLobbyUsers(List<UserEntity> lobbyUsers) {
+        this.lobbyUsers = lobbyUsers;
+    }
+
+    public void setUserActivities(List<UserEntity> userActivities) {
+        this.userActivities = userActivities;
     }
 }

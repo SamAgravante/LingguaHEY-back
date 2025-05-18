@@ -29,7 +29,7 @@ public class UserActivityLive {
     private LiveActivityEntity activity;
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
-    private boolean deployed = false; // default to false
+    private boolean inLobby = true; // true if user is in lobby, false if moved to activity
 
     public UserActivityLive() {
         super();
@@ -38,6 +38,6 @@ public class UserActivityLive {
     public UserActivityLive(UserEntity user, LiveActivityEntity activity) {
         this.user = user;
         this.activity = activity;
-        this.deployed = false;
+        this.inLobby = true;
     }
 }
