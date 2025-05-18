@@ -78,7 +78,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                     "/configuration/security",
                     "/swagger-ui/**",
                     "/webjars/**",
-                    "/swagger-ui.html"
+                    "/swagger-ui.html",
+                    "/ws/**"
                 )
                 .permitAll()
                 //Activities

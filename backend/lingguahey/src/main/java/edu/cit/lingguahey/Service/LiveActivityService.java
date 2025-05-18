@@ -6,6 +6,8 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.cit.lingguahey.Broadcaster.LiveActivityBroadcaster;
+import edu.cit.lingguahey.DTO.LiveActivityUpdate;
 import edu.cit.lingguahey.Entity.ChoiceEntity;
 import edu.cit.lingguahey.Entity.ClassroomActivityLive;
 import edu.cit.lingguahey.Entity.ClassroomEntity;
@@ -53,6 +55,9 @@ public class LiveActivityService {
     @Autowired
     private ChoiceRepository choiceRepo;
 
+    @Autowired
+    private LiveActivityBroadcaster broadcaster;
+
     // Create and assign to classroom and users
     public LiveActivityEntity postActivityEntity(LiveActivityEntity activity, int classroomId) {
         ClassroomEntity classroom = classroomRepo.findById(classroomId)
@@ -69,6 +74,12 @@ public class LiveActivityService {
             UserActivityLive userActivity = new UserActivityLive(user, postActivity);
             userActivityRepo.save(userActivity);
         }
+
+        // Broadcast creation event
+        broadcaster.broadcastUpdate(
+            postActivity.getActivityId(),
+            new LiveActivityUpdate(postActivity.getActivityId(), "CREATED", postActivity)
+        );
 
         return postActivity;
     }
@@ -109,7 +120,15 @@ public class LiveActivityService {
             if (newActivity.getQuestions() != null) {
                 activity.setQuestions(newActivity.getQuestions());
             }
-            return activityRepo.save(activity);
+            LiveActivityEntity updated = activityRepo.save(activity);
+
+            // Broadcast update event
+            broadcaster.broadcastUpdate(
+                updated.getActivityId(),
+                new LiveActivityUpdate(updated.getActivityId(), "UPDATED", updated)
+            );
+
+            return updated;
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("Activity " + activityId + " not found!");
         }
@@ -131,10 +150,16 @@ public class LiveActivityService {
             }
 
             activityRepo.deleteById(activityId);
+
+            // Broadcast delete event
+            broadcaster.broadcastUpdate(
+                activityId,
+                new LiveActivityUpdate(activityId, "DELETED", null)
+            );
+
             return "Activity " + activityId + " and its associations deleted successfully!";
         } else {
             throw new EntityNotFoundException("Activity " + activityId + " not found!");
         }
     }
 }
-
