@@ -89,7 +89,8 @@ public class UserEntity implements UserDetails {
     //Entity Relations
     @ManyToOne
     @JoinColumn(name = "classroom_id")
-    @JsonBackReference(value = "classroom-users")
+    //@JsonBackReference(value = "classroom-users")
+    @JsonIgnore
     private ClassroomEntity classroom;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

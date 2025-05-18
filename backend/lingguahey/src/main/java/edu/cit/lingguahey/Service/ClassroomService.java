@@ -7,6 +7,7 @@ import edu.cit.lingguahey.Entity.ClassroomUser;
 import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
+import edu.cit.lingguahey.Entity.Role;
 import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserActivityLive;
 import edu.cit.lingguahey.Entity.UserEntity;
@@ -24,9 +25,11 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.List;
@@ -90,8 +93,11 @@ public class ClassroomService {
             .orElseThrow(() -> new EntityNotFoundException("Classroom not found"));
         
         UserEntity currentUser = getCurrentUser();
-        if (currentUser.getRole().name().equals("TEACHER") && (classroom.getTeacher() == null || !(classroom.getTeacher().getUserId() == currentUser.getUserId()))) {
-            throw new AccessDeniedException("You do not own this classroom");
+        if (currentUser.getRole() == Role.TEACHER && classroom.getTeacher().getUserId() != currentUser.getUserId()) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "You do not own this classroom"
+            );
         }
 
         return classroom;

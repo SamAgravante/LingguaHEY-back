@@ -2,7 +2,6 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -41,7 +40,8 @@ public class LessonActivityEntity {
 
     @ManyToOne
     @JoinColumn(name = "classroom_id")
-    @JsonBackReference(value = "classroom-activities")
+    //@JsonBackReference(value = "classroom-activities")
+    @JsonIgnore
     private ClassroomEntity lessonClassroom;
 
     @ManyToMany(mappedBy = "activities")

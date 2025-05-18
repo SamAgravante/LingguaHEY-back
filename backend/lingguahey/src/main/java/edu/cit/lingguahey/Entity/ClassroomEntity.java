@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,11 +25,13 @@ public class ClassroomEntity {
 
     // Connections
     @OneToMany(mappedBy = "classroom")
-    @JsonManagedReference(value = "classroom-users")
+    //@JsonManagedReference(value = "classroom-users")
+    @JsonIgnore
     private List<UserEntity> users;
 
     @OneToMany(mappedBy = "lessonClassroom")
-    @JsonManagedReference(value = "classroom-activities")
+    //@JsonManagedReference(value = "classroom-activities")
+    @JsonIgnore
     private List<LessonActivityEntity> lessons;
 
     @OneToMany(mappedBy = "activityClassroom")
