@@ -33,10 +33,10 @@ public class LessonActivityController {
     LessonActivityService activityServ;
 
     // Create and assign to classroom and users
-    @PostMapping("/classrooms/{classroomId}")
+    @PostMapping("")
     @Operation(
         summary = "Create a new activity",
-        description = "Creates a new activity and assigns it to all users in the specified classroom",
+        description = "Creates a new activity and assigns it to all users in all the current classroom",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Activity data to create (without ID)",
             content = @Content(schema = @Schema(implementation = LessonActivityEntity.class))
@@ -46,16 +46,13 @@ public class LessonActivityController {
             @ApiResponse(responseCode = "400", description = "Invalid input",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
-            @ApiResponse(responseCode = "404", description = "Classroom not found",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
         }
     )
-    public ResponseEntity<LessonActivityEntity> postActivityEntity(@RequestBody LessonActivityEntity activity, @PathVariable int classroomId) {
-        LessonActivityEntity postActivity = activityServ.postActivityEntity(activity, classroomId);
+    public ResponseEntity<LessonActivityEntity> postActivityEntity(@RequestBody LessonActivityEntity activity) {
+        LessonActivityEntity postActivity = activityServ.postActivityEntity(activity);
         return ResponseEntity.status(201).body(postActivity);
     }
 

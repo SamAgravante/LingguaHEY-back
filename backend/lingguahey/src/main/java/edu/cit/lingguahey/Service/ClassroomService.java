@@ -72,6 +72,7 @@ public class ClassroomService {
     }
 
     // Create
+    @Transactional
     public ClassroomEntity postClassroomEntity(ClassroomEntity classroom) {
         UserEntity teacher = getCurrentUser();
         classroom.setTeacher(teacher);
@@ -190,6 +191,11 @@ public class ClassroomService {
         classroomUser.setClassroom(classroom);
         classroomUser.setUser(student);
         classroomUserRepo.save(classroomUser);
+
+        activityRepo.findAll().forEach(act -> {
+            UserActivity ua = new UserActivity(classroomUser.getUser(), act);
+            userActivityRepo.save(ua);
+        });
 
         return "Student added successfully to the classroom!";
     }

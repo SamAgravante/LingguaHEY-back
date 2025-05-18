@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.cit.lingguahey.Entity.ChoiceEntity;
-import edu.cit.lingguahey.Entity.ClassroomEntity;
-import edu.cit.lingguahey.Entity.ClassroomUser;
 import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.UserActivity;
@@ -24,6 +22,7 @@ import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.model.ActivityProgressDTO;
 import edu.cit.lingguahey.model.UserActivityProjection;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class LessonActivityService {
@@ -50,18 +49,14 @@ public class LessonActivityService {
     private ChoiceRepository choiceRepo;
 
     // Create and assign to classroom and users
-    public LessonActivityEntity postActivityEntity(LessonActivityEntity activity, int classroomId) {
-        ClassroomEntity classroom = classroomRepo.findById(classroomId)
-            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
-        activity.setLessonClassroom(classroom);
+    @Transactional
+    public LessonActivityEntity postActivityEntity(LessonActivityEntity activity) {
         LessonActivityEntity postActivity = activityRepo.save(activity);
 
-        List<ClassroomUser> classroomUsers = classroomUserRepo.findByClassroom_ClassroomID(classroomId);
-        for (ClassroomUser classroomUser : classroomUsers) {
-            UserEntity user = classroomUser.getUser();
-            UserActivity userActivity = new UserActivity(user, postActivity);
-            userActivityRepo.save(userActivity);
-        }
+        classroomUserRepo.findAll().forEach(cu -> {
+            UserActivity ua = new UserActivity(cu.getUser(), postActivity);
+            userActivityRepo.save(ua);
+        });
 
         return postActivity;
     }
