@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.cit.lingguahey.Entity.ScoreEntity;
 import edu.cit.lingguahey.Service.ScoreService;
 import edu.cit.lingguahey.model.ErrorResponse;
+import edu.cit.lingguahey.model.LeaderboardEntry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -210,6 +211,28 @@ public class ScoreController {
     public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
         int totalScore = scoreService.getTotalScoreForUser(userId);
         return ResponseEntity.ok().body(totalScore);
+    }
+
+
+
+    // Leaderboard
+    @GetMapping("/live-activities/{activityId}/leaderboard")
+    @Operation(
+        summary = "Get live leaderboard for a live activity",
+        description = "Returns the leaderboard (total scores per user) for a specific live activity",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<List<LeaderboardEntry>> getLiveActivityLeaderboard(@PathVariable int activityId) {
+        List<LeaderboardEntry> leaderboard = scoreService.getLiveActivityLeaderboard(activityId);
+        return ResponseEntity.ok().body(leaderboard);
     }
 
 }

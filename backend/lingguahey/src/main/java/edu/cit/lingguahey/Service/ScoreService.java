@@ -14,6 +14,7 @@ import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.ScoreRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.Repository.UserScoreRepository;
+import edu.cit.lingguahey.model.LeaderboardEntry;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -148,6 +149,12 @@ public class ScoreService {
         return userScoreRepo.findByUser_UserId(userId).stream()
             .mapToInt(userScore -> userScore.getScore())
             .sum();
+    }
+
+
+    // Leaderboard
+    public List<LeaderboardEntry> getLiveActivityLeaderboard(int activityId) {
+        return userScoreRepo.findLeaderboardByLiveActivity(activityId);
     }
 }
 

@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import edu.cit.lingguahey.Entity.UserScore;
+import edu.cit.lingguahey.model.LeaderboardEntry;
 import edu.cit.lingguahey.model.UserScoreProjection;
 
 @Repository
@@ -26,4 +28,17 @@ public interface UserScoreRepository extends JpaRepository<UserScore, Integer> {
             ORDER BY `rank`
             """, nativeQuery = true)
     List<UserScoreProjection> getLeaderboardWithRank();
+
+    @Query("""
+        SELECT 
+            us.user.userId as userId,
+            us.user.firstName as firstName,
+            us.user.lastName as lastName,
+            SUM(us.score) as totalScore
+        FROM UserScore us
+        WHERE us.question.liveActivity.activityId = :activityId
+        GROUP BY us.user.userId, us.user.firstName, us.user.lastName
+        ORDER BY totalScore DESC
+    """)
+    List<LeaderboardEntry> findLeaderboardByLiveActivity(@Param("activityId") int activityId);
 }
