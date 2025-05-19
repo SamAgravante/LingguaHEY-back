@@ -15,4 +15,5 @@ public interface UserActivityLiveRepository extends JpaRepository<UserActivityLi
     List<UserActivityLiveProjection> findByUser_UserId(int userId);
     List<UserActivityLive> findByActivity_ActivityId(int activityId);
     List<UserActivityLive> findByActivity_ActivityIdAndInLobby(int activityId, boolean inLobby);
+    Optional<UserActivityLive> findByUser_UserIdAndActivity_ActivityIdAndInLobby(int userId, int activityId, boolean inLobby);
 }

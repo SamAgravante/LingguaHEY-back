@@ -15,7 +15,9 @@ import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.Service.UserActivityLiveService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 @RestController
 @RequestMapping("/api/lingguahey/lobby")
@@ -23,51 +25,25 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UserActivityLiveController {
 
     @Autowired
-    private UserActivityLiveRepository userActivityLiveRepository;
+    private UserActivityLiveService userActivityLiveService;
 
-    @Autowired
-    private LiveActivityRepository liveActivityRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    // User joins lobby
     @PostMapping("/{activityId}/join")
     public ResponseEntity<?> joinLobby(@PathVariable int activityId, @RequestParam int userId) {
-        LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
-        UserEntity user = userRepository.findById(userId).orElseThrow();
-        UserActivityLive userActivity = new UserActivityLive(user, activity);
-        userActivityLiveRepository.save(userActivity);
-        return ResponseEntity.ok("Joined lobby");
+        return userActivityLiveService.joinLobby(activityId, userId);
     }
 
-    // Get lobby users
     @GetMapping("/{activityId}/users")
     public List<UserEntity> getLobbyUsers(@PathVariable int activityId) {
-        List<UserActivityLive> lobbyEntries = userActivityLiveRepository.findByActivity_ActivityIdAndInLobby(activityId, true);
-        List<UserEntity> users = new ArrayList<>();
-        for (UserActivityLive entry : lobbyEntries) {
-            users.add(entry.getUser());
-        }
-        return users;
+        return userActivityLiveService.getLobbyUsers(activityId);
     }
 
-    // Teacher starts activity
     @PostMapping("/{activityId}/start")
     public ResponseEntity<?> startActivity(@PathVariable int activityId, @RequestParam int teacherId) {
-        LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
-        UserEntity teacher = userRepository.findById(teacherId).orElseThrow();
-        if (teacher.getRole() != Role.TEACHER) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only teacher can start activity");
-        }
-        // Move all lobby users to active (set inLobby to false)
-        List<UserActivityLive> lobbyEntries = userActivityLiveRepository.findByActivity_ActivityIdAndInLobby(activityId, true);
-        for (UserActivityLive entry : lobbyEntries) {
-            entry.setInLobby(false);
-        }
-        userActivityLiveRepository.saveAll(lobbyEntries);
-        activity.setDeployed(true);
-        liveActivityRepository.save(activity);
-        return ResponseEntity.ok("Activity started");
+        return userActivityLiveService.startActivity(activityId, teacherId);
+    }
+
+    @DeleteMapping("/{activityId}/leave")
+    public ResponseEntity<?> leaveLobby(@PathVariable int activityId, @RequestParam int userId) {
+        return userActivityLiveService.leaveLobby(activityId, userId);
     }
 }
