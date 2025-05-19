@@ -15,10 +15,11 @@ import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-// Example: LobbyController.java
 @RestController
 @RequestMapping("/api/lingguahey/lobby")
+@Tag(name = "Lobby")
 public class UserActivityLiveController {
 
     @Autowired
