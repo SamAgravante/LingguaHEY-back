@@ -1,5 +1,7 @@
 package edu.cit.lingguahey.Service;
 
+import edu.cit.lingguahey.Broadcaster.LobbyBroadcaster;
+import edu.cit.lingguahey.DTO.LobbyUpdate;
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.Role;
 import edu.cit.lingguahey.Entity.UserActivityLive;
@@ -14,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserActivityLiveService {
@@ -28,11 +29,15 @@ public class UserActivityLiveService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LobbyBroadcaster lobbyBroadcaster;
+
     public ResponseEntity<?> joinLobby(int activityId, int userId) {
         LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
         UserEntity user = userRepository.findById(userId).orElseThrow();
         UserActivityLive userActivity = new UserActivityLive(user, activity);
         userActivityLiveRepository.save(userActivity);
+        broadcastLobby(activityId);
         return ResponseEntity.ok("Joined lobby");
     }
 
@@ -58,20 +63,27 @@ public class UserActivityLiveService {
         userActivityLiveRepository.saveAll(lobbyEntries);
         activity.setDeployed(true);
         liveActivityRepository.save(activity);
+        broadcastLobby(activityId);
         return ResponseEntity.ok("Activity started");
     }
 
     public ResponseEntity<?> leaveLobby(int activityId, int userId) {
         List<UserActivityLive> userActivities = userActivityLiveRepository
-        .findByActivity_ActivityIdAndInLobby(activityId, true)
-        .stream()
-        .filter(entry -> entry.getUser().getUserId() == userId)
-        .toList();
+            .findByActivity_ActivityIdAndInLobby(activityId, true)
+            .stream()
+            .filter(entry -> entry.getUser().getUserId() == userId)
+            .toList();
 
         if (userActivities.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in lobby");
         }
         userActivityLiveRepository.deleteAll(userActivities);
+        broadcastLobby(activityId);
         return ResponseEntity.ok("Left lobby");
+    }
+
+    private void broadcastLobby(int activityId) {
+        List<UserEntity> users = getLobbyUsers(activityId);
+        lobbyBroadcaster.broadcastLobbyUpdate(activityId, new LobbyUpdate(users));
     }
 }
