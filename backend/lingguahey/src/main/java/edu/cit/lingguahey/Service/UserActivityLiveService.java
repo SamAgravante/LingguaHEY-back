@@ -62,12 +62,16 @@ public class UserActivityLiveService {
     }
 
     public ResponseEntity<?> leaveLobby(int activityId, int userId) {
-        Optional<UserActivityLive> userActivityOpt = userActivityLiveRepository
-            .findByUser_UserIdAndActivity_ActivityIdAndInLobby(userId, activityId, true);
-        if (userActivityOpt.isEmpty()) {
+        List<UserActivityLive> userActivities = userActivityLiveRepository
+        .findByActivity_ActivityIdAndInLobby(activityId, true)
+        .stream()
+        .filter(entry -> entry.getUser().getUserId() == userId)
+        .toList();
+
+        if (userActivities.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in lobby");
         }
-        userActivityLiveRepository.delete(userActivityOpt.get());
+        userActivityLiveRepository.deleteAll(userActivities);
         return ResponseEntity.ok("Left lobby");
     }
 }
