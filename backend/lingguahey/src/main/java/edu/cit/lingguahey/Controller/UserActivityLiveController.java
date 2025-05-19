@@ -18,7 +18,7 @@ import edu.cit.lingguahey.Repository.UserRepository;
 
 // Example: LobbyController.java
 @RestController
-@RequestMapping("/api/lobby")
+@RequestMapping("/api/lingguahey/lobby")
 public class UserActivityLiveController {
 
     @Autowired
