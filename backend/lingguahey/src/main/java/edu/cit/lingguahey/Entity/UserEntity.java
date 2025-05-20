@@ -21,7 +21,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -74,9 +73,8 @@ public class UserEntity implements UserDetails {
         PREMIUM_PLUS
     }
 
-    @Lob
-    @Column(name = "profile_picture", columnDefinition = "MEDIUMBLOB", nullable = true)
-    private byte[] profilePic;
+    @Column(nullable = true)
+    private int profilePic;
 
     //Spring Security ug JWT
     @Enumerated(EnumType.STRING)
@@ -163,7 +161,7 @@ public class UserEntity implements UserDetails {
     }
 
     public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, boolean subscriptionStatus, boolean subscriptionType, 
-            Date subscriptionEndDate, byte[] profilePic, Role role, Date createdAt) {
+            Date subscriptionEndDate, int profilePic, Role role, Date createdAt) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -180,7 +178,7 @@ public class UserEntity implements UserDetails {
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, 
             String password, String idNumber, int totalPoints, boolean subscriptionStatus, 
             SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate, 
-            byte[] profilePic, Role role, List<Token> tokens, ClassroomEntity classroom, 
+            int profilePic, Role role, List<Token> tokens, ClassroomEntity classroom, 
             List<ScoreEntity> scores, List<ClassroomEntity> classrooms, 
             List<LessonActivityEntity> activities, LiveActivityEntity liveActivity, Date createdAt) {
         this.userId = userId;
@@ -209,7 +207,7 @@ public class UserEntity implements UserDetails {
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email,
                       String password, String idNumber, int totalPoints, boolean subscriptionStatus,
                       SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate,
-                      Date createdAt, byte[] profilePic, Role role, List<Token> tokens, ClassroomEntity classroom,
+                      Date createdAt, int profilePic, Role role, List<Token> tokens, ClassroomEntity classroom,
                       List<ScoreEntity> scores, List<ClassroomEntity> classrooms,
                       List<LessonActivityEntity> activities, LiveActivityEntity liveActivity) {
         this.userId = userId;
@@ -324,11 +322,11 @@ public class UserEntity implements UserDetails {
         this.subscriptionEndDate = subscriptionEndDate;
     }
 
-    public byte[] getProfilePic() {
+    public int getProfilePic() {
         return profilePic;
     }
 
-    public void setProfilePic(byte[] profilePic) {
+    public void setProfilePic(int profilePic) {
         this.profilePic = profilePic;
     }
 
