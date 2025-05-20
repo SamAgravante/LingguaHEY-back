@@ -1,20 +1,20 @@
 package edu.cit.lingguahey.DTO;
 
 import java.util.List;
-import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.model.LobbyDTO;
 
 public class LobbyUpdate {
-    private List<UserEntity> users;
+    private List<LobbyDTO> users;
 
-    public LobbyUpdate(List<UserEntity> users) {
+    public LobbyUpdate(List<LobbyDTO> users) {
         this.users = users;
     }
 
-    public List<UserEntity> getUsers() {
+    public List<LobbyDTO> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserEntity> users) {
+    public void setUsers(List<LobbyDTO> users) {
         this.users = users;
     }
 }

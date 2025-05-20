@@ -9,6 +9,8 @@ import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.model.LobbyDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,7 +85,13 @@ public class UserActivityLiveService {
     }
 
     private void broadcastLobby(int activityId) {
-        List<UserEntity> users = getLobbyUsers(activityId);
+        List<UserActivityLive> lobbyEntries = userActivityLiveRepository.findByActivity_ActivityIdAndInLobby(activityId, true);
+        List<LobbyDTO> users = lobbyEntries.stream()
+            .map(entry -> {
+                UserEntity u = entry.getUser();
+                return new LobbyDTO(u.getUserId(), u.getFirstName(), u.getLastName(), u.getRole().name());
+            })
+            .toList();
         lobbyBroadcaster.broadcastLobbyUpdate(activityId, new LobbyUpdate(users));
     }
 }
