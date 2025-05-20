@@ -35,6 +35,16 @@ public class UserActivityLiveService {
     private LobbyBroadcaster lobbyBroadcaster;
 
     public ResponseEntity<?> joinLobby(int activityId, int userId) {
+        // Check if user is already in the lobby
+        boolean alreadyInLobby = userActivityLiveRepository
+            .findByActivity_ActivityIdAndInLobby(activityId, true)
+            .stream()
+            .anyMatch(entry -> entry.getUser().getUserId() == userId);
+    
+        if (alreadyInLobby) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already in lobby");
+        }
+    
         LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
         UserEntity user = userRepository.findById(userId).orElseThrow();
         UserActivityLive userActivity = new UserActivityLive(user, activity);
