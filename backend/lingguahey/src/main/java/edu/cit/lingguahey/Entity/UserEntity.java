@@ -25,7 +25,11 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.PrePersist;
 import lombok.Builder;
+import java.util.Date;
 
 @Builder
 @Entity
@@ -44,6 +48,32 @@ public class UserEntity implements UserDetails {
     private int totalPoints;
     @Builder.Default
     private boolean subscriptionStatus = false;
+    
+    private SubscriptionType subscriptionType;
+
+    @Column(name = "subscription_start_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date subscriptionStartDate;
+
+    @Column(name = "subscription_end_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date subscriptionEndDate;
+
+    @Column(name = "created_at", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = new Date();
+    }
+
+    public enum SubscriptionType {
+        FREE,
+        PREMIUM,
+        PREMIUM_PLUS
+    }
+
     @Lob
     @Column(name = "profile_picture", columnDefinition = "MEDIUMBLOB", nullable = true)
     private byte[] profilePic;
@@ -120,7 +150,7 @@ public class UserEntity implements UserDetails {
         super();
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, Role role) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, Role role, Date createdAt) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -129,9 +159,11 @@ public class UserEntity implements UserDetails {
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
         this.role = role;
+        this.createdAt = createdAt;
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, boolean subscriptionStatus, byte[] profilePic, Role role) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, boolean subscriptionStatus, boolean subscriptionType, 
+            Date subscriptionEndDate, byte[] profilePic, Role role, Date createdAt) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -142,12 +174,15 @@ public class UserEntity implements UserDetails {
         this.subscriptionStatus = subscriptionStatus;
         this.profilePic = profilePic;
         this.role = role;
+        this.createdAt = createdAt;
     }
     
-    public UserEntity(int userId, String firstName, String middleName, String lastName, String email, String password,
-            String idNumber, int totalPoints, boolean subscriptionStatus, byte[] profilePic, Role role, List<Token> tokens,
-            ClassroomEntity classroom, List<ScoreEntity> scores, List<ClassroomEntity> classrooms, List<LessonActivityEntity> activities,
-            LiveActivityEntity liveActivity) {
+    public UserEntity(int userId, String firstName, String middleName, String lastName, String email, 
+            String password, String idNumber, int totalPoints, boolean subscriptionStatus, 
+            SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate, 
+            byte[] profilePic, Role role, List<Token> tokens, ClassroomEntity classroom, 
+            List<ScoreEntity> scores, List<ClassroomEntity> classrooms, 
+            List<LessonActivityEntity> activities, LiveActivityEntity liveActivity, Date createdAt) {
         this.userId = userId;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -157,6 +192,39 @@ public class UserEntity implements UserDetails {
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
         this.subscriptionStatus = subscriptionStatus;
+        this.subscriptionType = subscriptionType;
+        this.subscriptionStartDate = subscriptionStartDate;
+        this.subscriptionEndDate = subscriptionEndDate;
+        this.profilePic = profilePic;
+        this.role = role;
+        this.tokens = tokens;
+        this.classroom = classroom;
+        this.scores = scores;
+        this.classrooms = classrooms;
+        this.activities = activities;
+        this.liveActivity = liveActivity;
+        this.createdAt = createdAt;
+    }
+
+    public UserEntity(int userId, String firstName, String middleName, String lastName, String email,
+                      String password, String idNumber, int totalPoints, boolean subscriptionStatus,
+                      SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate,
+                      Date createdAt, byte[] profilePic, Role role, List<Token> tokens, ClassroomEntity classroom,
+                      List<ScoreEntity> scores, List<ClassroomEntity> classrooms,
+                      List<LessonActivityEntity> activities, LiveActivityEntity liveActivity) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.idNumber = idNumber;
+        this.totalPoints = totalPoints;
+        this.subscriptionStatus = subscriptionStatus;
+        this.subscriptionType = subscriptionType;
+        this.subscriptionStartDate = subscriptionStartDate;
+        this.subscriptionEndDate = subscriptionEndDate;
+        this.createdAt = createdAt;
         this.profilePic = profilePic;
         this.role = role;
         this.tokens = tokens;
@@ -235,6 +303,26 @@ public class UserEntity implements UserDetails {
     public void setSubscriptionStatus(boolean subscriptionStatus) {
         this.subscriptionStatus = subscriptionStatus;
     }
+    public SubscriptionType getSubscriptionType() {
+        return subscriptionType;
+    }
+
+    public void setSubscriptionType(SubscriptionType subscriptionType) {
+        this.subscriptionType = subscriptionType;
+    }
+    public Date getSubscriptionStartDate() {
+            return subscriptionStartDate;
+    }
+    public void setSubscriptionStartDate(Date subscriptionStartDate) {
+            this.subscriptionStartDate = subscriptionStartDate;
+    }
+    public Date getSubscriptionEndDate() {
+        return subscriptionEndDate;
+    }
+
+    public void setSubscriptionEndDate(Date subscriptionEndDate) {
+        this.subscriptionEndDate = subscriptionEndDate;
+    }
 
     public byte[] getProfilePic() {
         return profilePic;
@@ -283,5 +371,8 @@ public class UserEntity implements UserDetails {
     public void setClassrooms(List<ClassroomEntity> classrooms) {
         this.classrooms = classrooms;
     }
-    
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 }

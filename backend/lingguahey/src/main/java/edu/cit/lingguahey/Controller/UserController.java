@@ -1,8 +1,11 @@
 package edu.cit.lingguahey.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.persistence.EntityNotFoundException;
 
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Service.UserService;
@@ -154,11 +158,11 @@ public class UserController {
         summary = "Update a subscription status",
         description = "Updates the subscription status information by their ID",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "User data to update (with ID)",
-            content = @Content(schema = @Schema(implementation = UserEntity.class))
+            description = "Subscription update data",
+            content = @Content(schema = @Schema(implementation = SubscriptionUpdateRequest.class))
         ),
         responses = {
-            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "200", description = "Subscription updated successfully"),
             @ApiResponse(responseCode = "400", description = "Bad request",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
@@ -172,12 +176,36 @@ public class UserController {
     )
     @PreAuthorize("#id == principal.userId or hasAuthority('admin:update')")
     @Transactional
-    public String updateSubscriptionStatus(@PathVariable int id, @RequestParam boolean subscriptionStatus) {
+    public ResponseEntity<?> updateSubscriptionStatus(
+            @PathVariable int id,
+            @RequestBody SubscriptionUpdateRequest request) {
         try {
-            userServ.updateSubscriptionStatus(id, subscriptionStatus);
-            return "Subscription status updated successfully!";
+            UserEntity user = userServ.getUserEntity(id);
+            userServ.updateSubscriptionStatus(
+                id, 
+                request.isSubscriptionStatus(), 
+                request.getSubscriptionType()
+            );
+            UserEntity updatedUser = userServ.getUserEntity(id);
+            
+            return ResponseEntity.ok()
+                .body(Map.of(
+                    "message", "Subscription updated successfully",
+                    "userId", updatedUser.getUserId(),
+                    "subscriptionStatus", updatedUser.getSubscriptionStatus(),
+                    "subscriptionType", updatedUser.getSubscriptionType(),
+                    "startDate", updatedUser.getSubscriptionStartDate(),
+                    "endDate", updatedUser.getSubscriptionEndDate()
+                ));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", "User not found"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            return "Error updating subscription status: " + e.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Error updating subscription status: " + e.getMessage()));
         }
     }
 
