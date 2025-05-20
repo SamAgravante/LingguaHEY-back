@@ -1,5 +1,7 @@
 package edu.cit.lingguahey.Service;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -80,12 +82,48 @@ public class UserService {
             return "User " +userId+ "not found!";
         }
     }
+    @Transactional
+    public void updateSubscriptionStatus(Integer userId, boolean subscriptionStatus, String subscriptionType) {
+        UserEntity user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-    // Update Subscription Status
-    public void updateSubscriptionStatus(Integer userId, boolean subscriptionStatus) {
-        UserEntity user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         user.setSubscriptionStatus(subscriptionStatus);
-        userRepo.save(user);
+
+        if (subscriptionStatus) {
+            Date startDate = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(startDate);
+
+            try {
+                UserEntity.SubscriptionType type = UserEntity.SubscriptionType.valueOf(subscriptionType);
+                user.setSubscriptionType(type);
+                user.setSubscriptionStartDate(startDate);
+                
+                if (type == UserEntity.SubscriptionType.PREMIUM_PLUS) {
+                    calendar.add(Calendar.MONTH, 6);
+                } else if (type == UserEntity.SubscriptionType.PREMIUM) {
+                    calendar.add(Calendar.MONTH, 1);
+                }
+                user.setSubscriptionEndDate(calendar.getTime());
+
+                // Logging to verify the dates are being set correctly
+                System.out.println("Setting subscription for user " + userId);
+                System.out.println("Type: " + type);
+                System.out.println("Start date: " + startDate);
+                System.out.println("End date: " + calendar.getTime());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid subscription type: " + subscriptionType);
+            }
+        } else {
+            user.setSubscriptionType(UserEntity.SubscriptionType.FREE);
+            user.setSubscriptionStartDate(null);
+            user.setSubscriptionEndDate(null);
+        }
+        UserEntity savedUser = userRepo.save(user);
+        System.out.println("Saved user subscription status: " + savedUser.getSubscriptionStatus());
+        System.out.println("Saved user subscription type: " + savedUser.getSubscriptionType());
+        System.out.println("Saved user subscription start date: " + savedUser.getSubscriptionStartDate());
+        System.out.println("Saved user subscription end date: " + savedUser.getSubscriptionEndDate());
     }
 
     // Password Reset
