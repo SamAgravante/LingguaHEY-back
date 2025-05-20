@@ -17,7 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserActivityLiveService {
@@ -68,14 +71,23 @@ public class UserActivityLiveService {
         if (teacher.getRole() != Role.TEACHER) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only teacher can start activity");
         }
-        List<UserActivityLive> lobbyEntries = userActivityLiveRepository.findByActivity_ActivityIdAndInLobby(activityId, true);
-        for (UserActivityLive entry : lobbyEntries) {
-            entry.setInLobby(false);
-        }
+
+        List<UserActivityLive> lobbyEntries = userActivityLiveRepository
+            .findByActivity_ActivityIdAndInLobby(activityId, true);
+
+        // Mark everyone as left the lobby
+        lobbyEntries.forEach(entry -> entry.setInLobby(false));
         userActivityLiveRepository.saveAll(lobbyEntries);
+
         activity.setDeployed(true);
         liveActivityRepository.save(activity);
+
+        // 1) Send an UPDATE so clients see an empty lobby if you want
         broadcastLobby(activityId);
+
+        // 2) Send a START event so frontend can navigate
+        lobbyBroadcaster.broadcastStartMessage(activityId);
+
         return ResponseEntity.ok("Activity started");
     }
 
@@ -95,13 +107,16 @@ public class UserActivityLiveService {
     }
 
     private void broadcastLobby(int activityId) {
-        List<UserActivityLive> lobbyEntries = userActivityLiveRepository.findByActivity_ActivityIdAndInLobby(activityId, true);
-        List<LobbyDTO> users = lobbyEntries.stream()
+        List<LobbyDTO> users = userActivityLiveRepository
+            .findByActivity_ActivityIdAndInLobby(activityId, true)
+            .stream()
             .map(entry -> {
-                UserEntity u = entry.getUser();
-                return new LobbyDTO(u.getUserId(), u.getFirstName(), u.getLastName(), u.getRole().name());
+                var u = entry.getUser();
+                return new LobbyDTO(u.getUserId(), u.getFirstName(), u.getLastName(), u.getRole().name(), u.getProfilePic());
             })
-            .toList();
-        lobbyBroadcaster.broadcastLobbyUpdate(activityId, new LobbyUpdate(users));
+            .collect(Collectors.toList());
+
+        LobbyUpdate update = new LobbyUpdate(users);
+        lobbyBroadcaster.broadcastLobbyUpdate(activityId, update);
     }
 }
