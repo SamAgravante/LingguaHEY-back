@@ -31,6 +31,9 @@ public class UserActivityLive {
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean inLobby = true; // true if user is in lobby, false if moved to activity
 
+    @Column(nullable = false)
+    private int score = 0; // <-- Add this field
+
     public UserActivityLive() {
         super();
     }
@@ -39,5 +42,13 @@ public class UserActivityLive {
         this.user = user;
         this.activity = activity;
         this.inLobby = true;
+    }
+
+    public int getScore() { // <-- Add this getter
+        return score;
+    }
+
+    public void setScore(int score) { // <-- Add this setter
+        this.score = score;
     }
 }

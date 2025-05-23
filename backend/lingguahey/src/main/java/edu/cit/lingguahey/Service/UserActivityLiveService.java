@@ -117,4 +117,8 @@ public class UserActivityLiveService {
         LobbyUpdate update = new LobbyUpdate(users);
         lobbyBroadcaster.broadcastLobbyUpdate(activityId, update);
     }
+
+    public List<UserActivityLive> getUserActivities(int activityId) {
+        return userActivityLiveRepository.findByActivity_ActivityId(activityId);
+    }
 }
