@@ -155,9 +155,9 @@ public class LiveActivityController {
             )
         }
     )
-    public ResponseEntity<LiveActivityEntity> getDeployedActivityForClassroom(@PathVariable int classroomId) {
-        LiveActivityEntity deployedActivity = activityServ.getDeployedActivityForClassroom(classroomId);
-        return ResponseEntity.ok().body(deployedActivity);
+    public ResponseEntity<Integer> getDeployedActivityForClassroom(@PathVariable int classroomId) {
+        int deployedActivityId = activityServ.getDeployedActivityForClassroom(classroomId);
+        return ResponseEntity.ok().body(deployedActivityId);
     }
 
     // Update
@@ -205,5 +205,26 @@ public class LiveActivityController {
     public ResponseEntity<String> deleteActivityEntity(@PathVariable int id) {
         String result = activityServ.deleteActivityEntity(id);
         return ResponseEntity.ok().body(result);
+    }
+
+    // Update activity deployed status
+    @PutMapping("/{activityId}/set-deployed/{deployStatus}")
+    @Operation(
+        summary = "Set the deployment status of a live activity",
+        description = "Sets the 'isDeployed' status of a live activity. " +
+                      "If setting to 'true', any other currently deployed activity in the same classroom will be undeployed.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Activity deployment status updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Live activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<LiveActivityEntity> setActivityDeployedStatus(@PathVariable int activityId, @PathVariable boolean deployStatus) {
+        LiveActivityEntity updatedActivity = activityServ.setActivityDeployedStatus(activityId, deployStatus);
+        return ResponseEntity.ok().body(updatedActivity);
     }
 }

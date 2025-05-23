@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.lingguahey.Broadcaster.LiveActivityBroadcaster;
 import edu.cit.lingguahey.DTO.LiveActivityUpdate;
@@ -112,13 +113,14 @@ public class LiveActivityService {
     }
 
     // Read deployed activity for a classroom
-    public LiveActivityEntity getDeployedActivityForClassroom(int classroomId) {
+    public int getDeployedActivityForClassroom(int classroomId) {
         classroomRepo.findById(classroomId)
-                .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+            .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
 
         Optional<LiveActivityEntity> deployedActivity = activityRepo.findByActivityClassroom_ClassroomIDAndIsDeployedTrue(classroomId);
 
-        return deployedActivity.orElseThrow(() -> new EntityNotFoundException("No deployed live activity found for classroom ID: " + classroomId));
+        return deployedActivity.orElseThrow(() -> new EntityNotFoundException("No deployed live activity found for classroom ID: " + classroomId))
+            .getActivityId();
     }
 
     // Update
@@ -172,5 +174,29 @@ public class LiveActivityService {
         } else {
             throw new EntityNotFoundException("Activity " + activityId + " not found!");
         }
+    }
+
+    // Update activity deployed status
+    @Transactional
+    public LiveActivityEntity setActivityDeployedStatus(int activityId, boolean deploy) {
+        LiveActivityEntity activity = activityRepo.findById(activityId)
+            .orElseThrow(() -> new EntityNotFoundException("Activity " + activityId + " not found!"));
+
+        if (deploy) {
+            int classroomId = activity.getClassroom().getClassroomID();
+
+            Optional<LiveActivityEntity> existingDeployed = activityRepo.findByActivityClassroom_ClassroomIDAndIsDeployedTrue(classroomId);
+
+            if (existingDeployed.isPresent() && existingDeployed.get().getActivityId() != activityId) {
+                LiveActivityEntity oldDeployed = existingDeployed.get();
+                oldDeployed.setDeployed(false);
+                activityRepo.save(oldDeployed);
+            }
+        }
+
+        activity.setDeployed(deploy);
+        LiveActivityEntity updatedActivity = activityRepo.save(activity);
+
+        return updatedActivity;
     }
 }
