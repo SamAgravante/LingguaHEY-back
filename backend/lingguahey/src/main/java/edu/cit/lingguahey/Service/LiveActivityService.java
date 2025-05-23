@@ -153,7 +153,7 @@ public class LiveActivityService {
             List<ClassroomActivityLive> classroomActivities = classroomActivityLiveRepo.findByActivity_ActivityId(activityId);
             classroomActivityLiveRepo.deleteAll(classroomActivities);
 
-            List<QuestionEntity> questions = questionRepo.findByActivity_ActivityId(activityId);
+            List<QuestionEntity> questions = questionRepo.findByLiveActivity_ActivityId(activityId);
             for (QuestionEntity question : questions) {
                 List<ChoiceEntity> choices = choiceRepo.findByQuestion_QuestionId(question.getQuestionId());
                 choiceRepo.deleteAll(choices);
