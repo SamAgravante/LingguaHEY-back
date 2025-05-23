@@ -139,6 +139,27 @@ public class LiveActivityController {
         return ResponseEntity.ok().body(activities);
     }
 
+    // Read deployed activity for a classroom
+    @GetMapping("/classrooms/{classroomId}/deployed")
+    @Operation(
+        summary = "Get the single deployed live activity for a classroom",
+        description = "Retrieves the live activity currently marked as deployed for a specific classroom. " +
+                      "It's assumed there is only one deployed activity per classroom.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Deployed live activity retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Classroom not found or no deployed activity for classroom",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<LiveActivityEntity> getDeployedActivityForClassroom(@PathVariable int classroomId) {
+        LiveActivityEntity deployedActivity = activityServ.getDeployedActivityForClassroom(classroomId);
+        return ResponseEntity.ok().body(deployedActivity);
+    }
+
     // Update
     @PutMapping("/{id}")
     @Operation(

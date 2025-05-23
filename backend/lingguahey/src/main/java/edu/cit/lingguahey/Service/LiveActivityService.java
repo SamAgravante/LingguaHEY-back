@@ -2,6 +2,7 @@ package edu.cit.lingguahey.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,6 +109,16 @@ public class LiveActivityService {
             .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
 
         return classroomActivityLiveRepo.findByClassroom_ClassroomID(classroomId);
+    }
+
+    // Read deployed activity for a classroom
+    public LiveActivityEntity getDeployedActivityForClassroom(int classroomId) {
+        classroomRepo.findById(classroomId)
+                .orElseThrow(() -> new EntityNotFoundException("Classroom not found with ID: " + classroomId));
+
+        Optional<LiveActivityEntity> deployedActivity = activityRepo.findByActivityClassroom_ClassroomIDAndIsDeployedTrue(classroomId);
+
+        return deployedActivity.orElseThrow(() -> new EntityNotFoundException("No deployed live activity found for classroom ID: " + classroomId));
     }
 
     // Update
