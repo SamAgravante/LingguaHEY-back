@@ -18,6 +18,7 @@ import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.UserActivityLive;
 import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.Entity.UserScore;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.ClassroomActivityLiveRepository;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
@@ -26,6 +27,7 @@ import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.Repository.UserScoreRepository;
 import edu.cit.lingguahey.model.ClassroomActivityLiveProjection;
 import edu.cit.lingguahey.model.UserActivityLiveProjection;
 import jakarta.persistence.EntityNotFoundException;
@@ -59,6 +61,9 @@ public class LiveActivityService {
 
     @Autowired
     private LiveActivityBroadcaster broadcaster;
+
+    @Autowired
+    private UserScoreRepository userScoreRepo;
 
     // Create and assign to classroom and users
     public LiveActivityEntity postActivityEntity(LiveActivityEntity activity, int classroomId) {
@@ -191,12 +196,33 @@ public class LiveActivityService {
                 LiveActivityEntity oldDeployed = existingDeployed.get();
                 oldDeployed.setDeployed(false);
                 activityRepo.save(oldDeployed);
+                deleteUserScoresForLiveActivity(oldDeployed.getActivityId());
             }
+        } else {
+            deleteUserScoresForLiveActivity(activityId);
         }
 
         activity.setDeployed(deploy);
         LiveActivityEntity updatedActivity = activityRepo.save(activity);
 
         return updatedActivity;
+    }
+
+    // delete all UserScore entries associated with questions
+    @Transactional
+    private void deleteUserScoresForLiveActivity(int liveActivityId) {
+        List<QuestionEntity> questions = questionRepo.findByLiveActivity_ActivityId(liveActivityId);
+        for (QuestionEntity question : questions) {
+            deleteUserScoresForQuestion(question.getQuestionId());
+        }
+    }
+
+    // delete all UserScore entries for a specific question
+    @Transactional
+    private void deleteUserScoresForQuestion(int questionId) {
+        List<UserScore> userScores = userScoreRepo.findByQuestion_QuestionId(questionId);
+        if (!userScores.isEmpty()) {
+            userScoreRepo.deleteAll(userScores);
+        }
     }
 }

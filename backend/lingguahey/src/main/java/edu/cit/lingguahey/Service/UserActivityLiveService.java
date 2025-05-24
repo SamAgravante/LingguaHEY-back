@@ -10,11 +10,13 @@ import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.model.LobbyDTO;
+import jakarta.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,9 @@ public class UserActivityLiveService {
 
     @Autowired
     private LobbyBroadcaster lobbyBroadcaster;
+
+    @Autowired
+    private LiveActivityService liveActivityService;
 
     public ResponseEntity<?> joinLobby(int activityId, int userId) {
         // Use the Optional-based repository method
@@ -71,6 +76,7 @@ public class UserActivityLiveService {
         return users;
     }
 
+    @Transactional
     public ResponseEntity<?> startActivity(int activityId, int teacherId) {
         LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
         UserEntity teacher = userRepository.findById(teacherId).orElseThrow();
@@ -95,6 +101,30 @@ public class UserActivityLiveService {
         lobbyBroadcaster.broadcastStartMessage(activityId);
 
         return ResponseEntity.ok("Activity started");
+    }
+
+    @Transactional
+    public ResponseEntity<?> stopActivity(int activityId, int teacherId) {
+        LiveActivityEntity activity = liveActivityRepository.findById(activityId)
+            .orElseThrow(() -> new EntityNotFoundException("Live Activity not found with ID: " + activityId));
+        UserEntity teacher = userRepository.findById(teacherId)
+            .orElseThrow(() -> new EntityNotFoundException("Teacher not found with ID: " + teacherId));
+
+        if (teacher.getRole() != Role.TEACHER) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only teacher can stop activity");
+        }
+
+        if (!activity.isDeployed()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Activity is not currently deployed/running.");
+        }
+        
+        liveActivityService.setActivityDeployedStatus(activityId, false);
+        List<UserActivityLive> activeEntries = userActivityLiveRepository.findByActivity_ActivityId(activityId);
+        userActivityLiveRepository.deleteAll(activeEntries);
+
+        lobbyBroadcaster.broadcastStopMessage(activityId);
+
+        return ResponseEntity.ok("Activity stopped and scores cleared.");
     }
 
     public ResponseEntity<?> leaveLobby(int activityId, int userId) {
@@ -127,6 +157,6 @@ public class UserActivityLiveService {
     }
 
     public List<UserActivityLive> getUserActivities(int activityId) {
-        return userActivityLiveRepository.findByActivity_ActivityId(activityId);
+        return userActivityLiveRepository.findByActivity_ActivityId(activityId);    
     }
 }

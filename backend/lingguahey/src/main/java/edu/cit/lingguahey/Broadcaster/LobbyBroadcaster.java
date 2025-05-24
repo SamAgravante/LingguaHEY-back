@@ -22,4 +22,10 @@ public class LobbyBroadcaster {
         startMsg.put("type", "START");
         messagingTemplate.convertAndSend("/topic/lobby/" + activityId, startMsg);
     }
+
+    public void broadcastStopMessage(int activityId) {
+        Map<String, Object> stopMsg = new HashMap<>();
+        stopMsg.put("type", "STOP");
+        messagingTemplate.convertAndSend("/topic/lobby/" + activityId, stopMsg);
+    }
 }
