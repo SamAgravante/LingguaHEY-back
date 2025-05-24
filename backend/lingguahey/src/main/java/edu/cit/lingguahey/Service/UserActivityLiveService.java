@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,16 +37,23 @@ public class UserActivityLiveService {
     private LobbyBroadcaster lobbyBroadcaster;
 
     public ResponseEntity<?> joinLobby(int activityId, int userId) {
-        // Check if user is already in the lobby
-        boolean alreadyInLobby = userActivityLiveRepository
-            .findByActivity_ActivityIdAndInLobby(activityId, true)
-            .stream()
-            .anyMatch(entry -> entry.getUser().getUserId() == userId);
+        // Use the Optional-based repository method
+        Optional<UserActivityLive> existingEntryOpt = userActivityLiveRepository
+            .findByUser_UserIdAndActivity_ActivityId(userId, activityId);
     
-        if (alreadyInLobby) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already in lobby");
+        if (existingEntryOpt.isPresent()) {
+            UserActivityLive entry = existingEntryOpt.get();
+            if (entry.isInLobby()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("User already in lobby");
+            } else {
+                entry.setInLobby(true);
+                userActivityLiveRepository.save(entry);
+                broadcastLobby(activityId);
+                return ResponseEntity.ok("Rejoined lobby");
+            }
         }
     
+        // No record exists, create new
         LiveActivityEntity activity = liveActivityRepository.findById(activityId).orElseThrow();
         UserEntity user = userRepository.findById(userId).orElseThrow();
         UserActivityLive userActivity = new UserActivityLive(user, activity);
