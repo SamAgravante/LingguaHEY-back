@@ -1,11 +1,14 @@
 package edu.cit.lingguahey.auth;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.lingguahey.Entity.LessonActivityEntity;
+import edu.cit.lingguahey.Entity.Role;
 import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
@@ -16,6 +19,9 @@ import edu.cit.lingguahey.config.JwtService;
 import edu.cit.lingguahey.token.Token;
 import edu.cit.lingguahey.token.TokenRepository;
 import edu.cit.lingguahey.token.TokenType;
+import edu.cit.lingguahey.Service.EmailService;
+import java.util.UUID;
+import java.util.Optional;
 
 @Service
 public class AuthenticationService {
@@ -28,11 +34,15 @@ public class AuthenticationService {
     private final ClassroomUserRepository classroomUserRepo;
     private final LessonActivityRepository activityRepo;
     private final UserActivityRepository userActivityRepo;
+    private final EmailService emailService;
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public AuthenticationService(UserRepository repository, TokenRepository tokenRepository, 
         PasswordEncoder passwordEncoder, JwtService jwtService, 
         AuthenticationManager authenticationManager, ClassroomUserRepository classroomUserRepo,
-        LessonActivityRepository activityRepo, UserActivityRepository userActivityRepo) {
+        LessonActivityRepository activityRepo, UserActivityRepository userActivityRepo,
+        EmailService emailService) {
         this.repository = repository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
@@ -41,13 +51,24 @@ public class AuthenticationService {
         this.classroomUserRepo = classroomUserRepo;
         this.activityRepo = activityRepo;
         this.userActivityRepo = userActivityRepo;
+        this.emailService = emailService;
     }
 
     //register
+    @Transactional
     public AuthenticationResponse register(RegisterRequest request) {
         if (repository.findByEmail(request.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Email already in use");
         }
+
+        boolean isEnabled = true;
+        String verificationToken = null;
+
+        if (request.getRole() == Role.TEACHER) {
+            isEnabled = false;
+            verificationToken = UUID.randomUUID().toString();
+        }
+
         var user = UserEntity.builder()
             .firstName(request.getFirstName())
             .middleName(request.getMiddleName())
@@ -58,19 +79,43 @@ public class AuthenticationService {
             .totalPoints(request.getTotalPoints())
             .subscriptionStatus(request.isSubscriptionStatus())
             .role(request.getRole())
+            .enabled(isEnabled)
+            .verificationToken(verificationToken)
             .build();
-        //assign activities to user
-        //var allActivities = activityRepo.findAll();
-        //user.setActivities(allActivities);
         
         var savedUser = repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        //save token to db for logout
-        saveUserToken(savedUser, jwtToken);
-        //
+
+        if (request.getRole() == Role.TEACHER) {
+            String verificationLink = baseUrl + "/api/auth/verify-email?token=" + verificationToken;
+            emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getFirstName(), verificationLink);
+        }
+
+        String jwtToken = null;
+        if (savedUser.isEnabled()) {
+            jwtToken = jwtService.generateToken(user);
+            saveUserToken(savedUser, jwtToken);
+        }
+        
         return AuthenticationResponse.builder()
             .token(jwtToken)
             .build();
+    }
+
+    @Transactional
+    public boolean verifyEmail(String verificationToken) {
+        Optional<UserEntity> userOptional = repository.findByVerificationToken(verificationToken);
+
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            if (user.getRole() == Role.TEACHER && !user.isEnabled()) {
+                user.setEnabled(true);
+                user.setVerificationToken(null);
+                repository.save(user);
+                return true;
+            }
+            return true;
+        }
+        return false;
     }
     
     //login

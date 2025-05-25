@@ -11,5 +11,6 @@ import edu.cit.lingguahey.Entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     
     Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByVerificationToken(String verificationToken);
 
 }

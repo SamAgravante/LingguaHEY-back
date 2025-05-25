@@ -27,10 +27,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.PrePersist;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import java.util.Date;
 
 @Builder
+@AllArgsConstructor
 @Entity
 public class UserEntity implements UserDetails {
     @Id
@@ -61,6 +63,12 @@ public class UserEntity implements UserDetails {
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
+
+    @Column(nullable = false)
+    private boolean enabled;
+
+    @Column(name = "verification_token")
+    private String verificationToken;
 
     @PrePersist
     protected void onCreate() {
@@ -111,7 +119,7 @@ public class UserEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
     //Entity Relations
@@ -372,5 +380,17 @@ public class UserEntity implements UserDetails {
 
     public Date getCreatedAt() {
         return createdAt;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
     }
 }
