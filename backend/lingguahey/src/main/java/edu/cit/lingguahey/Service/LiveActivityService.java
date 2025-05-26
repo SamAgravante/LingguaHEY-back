@@ -184,26 +184,49 @@ public class LiveActivityService {
     // Update activity deployed status
     @Transactional
     public LiveActivityEntity setActivityDeployedStatus(int activityId, boolean deploy) {
-        LiveActivityEntity activity = activityRepo.findById(activityId)
+        LiveActivityEntity activityToDeploy = activityRepo.findById(activityId)
             .orElseThrow(() -> new EntityNotFoundException("Activity " + activityId + " not found!"));
 
-        if (deploy) {
-            int classroomId = activity.getClassroom().getClassroomID();
+        int classroomId = activityToDeploy.getClassroom().getClassroomID();
 
-            Optional<LiveActivityEntity> existingDeployed = activityRepo.findByActivityClassroom_ClassroomIDAndIsDeployedTrue(classroomId);
+        Optional<ClassroomActivityLive> existingDeployedJunction = classroomActivityLiveRepo
+            .findByClassroom_ClassroomIDAndDeployedTrue(classroomId);
 
-            if (existingDeployed.isPresent() && existingDeployed.get().getActivityId() != activityId) {
-                LiveActivityEntity oldDeployed = existingDeployed.get();
-                oldDeployed.setDeployed(false);
-                activityRepo.save(oldDeployed);
-                deleteUserScoresForLiveActivity(oldDeployed.getActivityId());
+        if (existingDeployedJunction.isPresent()) {
+            ClassroomActivityLive oldDeployedCAL = existingDeployedJunction.get();
+            if (oldDeployedCAL.getActivity().getActivityId() != activityId) {
+                oldDeployedCAL.setDeployed(false);
+                classroomActivityLiveRepo.save(oldDeployedCAL);
+
+                LiveActivityEntity oldDeployedActivity = oldDeployedCAL.getActivity();
+                oldDeployedActivity.setDeployed(false);
+                activityRepo.save(oldDeployedActivity);
+                deleteUserScoresForLiveActivity(oldDeployedActivity.getActivityId());
             }
+        }
+
+        activityToDeploy.setDeployed(deploy);
+        LiveActivityEntity updatedActivity = activityRepo.save(activityToDeploy);
+
+        ClassroomActivityLive targetCAL = classroomActivityLiveRepo
+            .findByClassroom_ClassroomIDAndActivity_ActivityId(classroomId, activityId)
+            .orElseGet(() -> {
+                ClassroomActivityLive newCal = new ClassroomActivityLive(activityToDeploy.getClassroom(), activityToDeploy);
+                return classroomActivityLiveRepo.save(newCal);
+            });
+        targetCAL.setDeployed(deploy);
+        classroomActivityLiveRepo.save(targetCAL);
+
+        if (deploy) {
+            deleteUserScoresForLiveActivity(activityId);
         } else {
             deleteUserScoresForLiveActivity(activityId);
         }
 
-        activity.setDeployed(deploy);
-        LiveActivityEntity updatedActivity = activityRepo.save(activity);
+        broadcaster.broadcastUpdate(
+            updatedActivity.getActivityId(),
+            new LiveActivityUpdate(updatedActivity.getActivityId(), "DEPLOYMENT_STATUS_UPDATED", updatedActivity)
+        );
 
         return updatedActivity;
     }

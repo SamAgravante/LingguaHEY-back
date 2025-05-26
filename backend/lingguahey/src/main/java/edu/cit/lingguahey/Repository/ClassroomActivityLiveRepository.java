@@ -14,4 +14,5 @@ public interface ClassroomActivityLiveRepository extends JpaRepository<Classroom
     Optional<ClassroomActivityLive> findByClassroom_ClassroomIDAndActivity_ActivityId(int classroomId, int activityId);
     List<ClassroomActivityLiveProjection> findByClassroom_ClassroomID(int classroomId);
     List<ClassroomActivityLive> findByActivity_ActivityId(int activityId);
+    Optional<ClassroomActivityLive> findByClassroom_ClassroomIDAndDeployedTrue(int classroomId);
 }
