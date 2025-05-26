@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.token.TokenRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -21,6 +22,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private TokenRepository tokenRepo;
     
     // Create
     public UserEntity postUserEntity(UserEntity user){
@@ -141,5 +145,10 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepo.save(user);
+    }
+
+    // Get the count of active tokens
+    public long getActiveTokenCount() {
+        return tokenRepo.countAllValidTokens();
     }
 }

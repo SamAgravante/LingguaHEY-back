@@ -15,4 +15,10 @@ public interface TokenRepository extends JpaRepository<Token, Integer>{
     List<Token> findAllValidTokensByUser(int userId);
 
     Optional<Token> findByToken(String token);
+
+    @Query("""
+            SELECT COUNT(t) FROM Token t
+            WHERE t.expired = false AND t.revoked = false
+            """)
+    long countAllValidTokens();
 }

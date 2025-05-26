@@ -232,4 +232,23 @@ public class UserController {
         userServ.resetPassword(id, payload.getOldPassword(), payload.getNewPassword());
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/analytics/active-token-count")
+    @Operation(
+        summary = "Get count of active tokens",
+        description = "Retrieves the total number of unexpired and unrevoked tokens, useful for active user analytics.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful retrieval of active token count",
+                content = @Content(schema = @Schema(type = "integer", format = "int64"))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("hasAuthority('admin:read')")
+    public ResponseEntity<Long> getActiveTokenCount() {
+        long activeTokens = userServ.getActiveTokenCount();
+        return ResponseEntity.ok(activeTokens);
+    }
 }
