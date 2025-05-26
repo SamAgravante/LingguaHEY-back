@@ -1,9 +1,11 @@
 package edu.cit.lingguahey.auth;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.model.ErrorResponse;
@@ -65,5 +67,26 @@ public class AuthenticationController {
     )
     public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authService.authenticate(request));
+    }
+
+    @GetMapping("/verify-email")
+    @Operation(
+        summary = "Verify user email",
+        description = "Verifies a user's email address using a token sent via email.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired verification token",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+        }
+    )
+    public ResponseEntity<String> verifyEmail(@RequestParam("token") String token) {
+        boolean verified = authService.verifyEmail(token);
+        if (verified) {
+            // You might want to redirect to a success page here instead of just returning text
+            // return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("/verification-success")).build();
+            return ResponseEntity.ok("Email verified successfully! You can now log in.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid or expired verification token.");
+        }
     }
 }

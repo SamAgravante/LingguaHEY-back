@@ -86,7 +86,7 @@ public class AuthenticationService {
         var savedUser = repository.save(user);
 
         if (request.getRole() == Role.TEACHER) {
-            String verificationLink = baseUrl + "/api/auth/verify-email?token=" + verificationToken;
+            String verificationLink = baseUrl + "/api/lingguahey/auth/verify-email?token=" + verificationToken;
             emailService.sendVerificationEmail(savedUser.getEmail(), savedUser.getFirstName(), verificationLink);
         }
 

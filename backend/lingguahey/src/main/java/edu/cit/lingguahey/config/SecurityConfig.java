@@ -69,6 +69,7 @@ public class SecurityConfig implements WebMvcConfigurer {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/lingguahey/auth/**",
+                    "/api/lingguahey/auth/verify-email**",
                     "/v2/api-docs",
                     "/v3/api-docs",
                     "/v3/api-docs/**",
