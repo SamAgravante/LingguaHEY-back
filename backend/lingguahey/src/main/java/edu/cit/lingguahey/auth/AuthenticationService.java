@@ -63,10 +63,12 @@ public class AuthenticationService {
 
         boolean isEnabled = true;
         String verificationToken = null;
+        boolean emailVerificationNeeded = false;
 
         if (request.getRole() == Role.TEACHER) {
             isEnabled = false;
             verificationToken = UUID.randomUUID().toString();
+            emailVerificationNeeded = true;
         }
 
         var user = UserEntity.builder()
@@ -98,24 +100,32 @@ public class AuthenticationService {
         
         return AuthenticationResponse.builder()
             .token(jwtToken)
+            .emailVerificationRequired(emailVerificationNeeded)
             .build();
     }
 
     @Transactional
-    public boolean verifyEmail(String verificationToken) {
+    public VerificationResult verifyEmail(String verificationToken) {
         Optional<UserEntity> userOptional = repository.findByVerificationToken(verificationToken);
 
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            if (user.getRole() == Role.TEACHER && !user.isEnabled()) {
+        if (userOptional.isEmpty()) {
+            return VerificationResult.INVALID_TOKEN;
+        }
+
+        UserEntity user = userOptional.get();
+
+        if (user.getRole() == Role.TEACHER) {
+            if (user.isEnabled()) {
+                return VerificationResult.ALREADY_VERIFIED;
+            } else {
                 user.setEnabled(true);
                 user.setVerificationToken(null);
                 repository.save(user);
-                return true;
+                return VerificationResult.SUCCESS;
             }
-            return true;
+        } else {
+            return VerificationResult.NOT_TEACHER_ROLE;
         }
-        return false;
     }
     
     //login
