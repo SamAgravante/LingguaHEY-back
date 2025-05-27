@@ -165,7 +165,8 @@ public class UserActivityLiveController {
                 ua -> new LeaderboardEntry(
                     ua.getUser().getUserId(),
                     ua.getUser().getFirstName() + " " + ua.getUser().getLastName(),
-                    ua.getScore()
+                    ua.getScore(),
+                    ua.getUser().getProfilePic()
                 ),
                 (a, b) -> a // keep first if duplicate
             ))

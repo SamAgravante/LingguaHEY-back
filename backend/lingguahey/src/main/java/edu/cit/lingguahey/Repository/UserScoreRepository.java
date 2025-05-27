@@ -36,6 +36,7 @@ public interface UserScoreRepository extends JpaRepository<UserScore, Integer> {
             us.user.userId as userId,
             us.user.firstName as firstName,
             us.user.lastName as lastName,
+            us.user.profilePic as profilePic,
             SUM(us.score) as totalScore
         FROM UserScore us
         WHERE us.question.liveActivity.activityId = :activityId

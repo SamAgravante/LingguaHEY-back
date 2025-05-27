@@ -5,4 +5,5 @@ public interface LeaderboardEntry {
     String getFirstName();
     String getLastName();
     Integer getTotalScore();
+    Integer getProfilePic(); // Assuming profilePic is an Integer, adjust as necessary
 }
