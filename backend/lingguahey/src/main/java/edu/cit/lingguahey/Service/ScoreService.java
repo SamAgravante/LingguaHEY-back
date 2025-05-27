@@ -162,6 +162,36 @@ public class ScoreService {
             .mapToInt(UserScore::getScore)
             .sum();
     }
+    
+    // Total Score for User (for Live Activities)
+    @SuppressWarnings("unused")
+    public int getTotalScoreForLiveUser(int userId) {
+        UserEntity user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        
+        return userScoreRepo.findByUser_UserId(userId).stream()
+            .filter(userScore -> {
+                QuestionEntity question = userScore.getQuestion();
+                // Only include scores from questions that belong to LessonActivities
+                return question != null && 
+                    question.getActivity() == null && 
+                    question.getLiveActivity() != null;
+            })
+            .mapToInt(UserScore::getScore)
+            .sum();
+    }
+
+    // Total Score for Live Activity
+    public int getTotalScoreForLiveActivity(int liveActivityId) {
+    // Find all questions for the live activity
+    List<QuestionEntity> questions = questionRepo.findByLiveActivity_ActivityId(liveActivityId);
+    
+    // Sum up all scores from the questions
+    return questions.stream()
+        .filter(question -> question.getScore() != null)
+        .mapToInt(question -> question.getScore().getScore())
+        .sum();
+    }
 
 
     // Leaderboard
@@ -182,6 +212,7 @@ public class ScoreService {
         }
     }
     
+    //Live Activity Score Statistics
     public Map<String, Double> getActivityScoreStatistics(int activityId) {
         Map<String, Double> statistics = new HashMap<>();
         
@@ -205,21 +236,5 @@ public class ScoreService {
         return statistics;
     }
 
-    //Score status for Live Activity
-    public Map<String, Object> getUserPassStatus(int userId) {
-        int totalScore = getTotalScoreForUser(userId);
-        int maxPossibleScore = scoreRepo.getMaxPossibleScore(userId);
-        double passingScore = maxPossibleScore * 0.70; // 70% passing rate
-        boolean passed = totalScore >= passingScore;
-        
-        Map<String, Object> status = new HashMap<>();
-        status.put("passed", passed);
-        status.put("userScore", totalScore);
-        status.put("maxPossibleScore", maxPossibleScore);
-        status.put("requiredScore", passingScore);
-        status.put("passingRate", "70%");
-        
-        return status;
-    }
 }
 

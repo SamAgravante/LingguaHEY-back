@@ -212,7 +212,47 @@ public class ScoreController {
         int totalScore = scoreService.getTotalScoreForUser(userId);
         return ResponseEntity.ok().body(totalScore);
     }
+     
+    // Total Live Score for User
+    @GetMapping("/users/{userId}/total-live")
+    @Operation(
+        summary = "Get total live activity score for a user",
+        description = "Calculates and retrieves the total score for a specific user's live activities only",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
+    public ResponseEntity<Integer> getTotalLiveScoreForUser(@PathVariable int userId) {
+        int totalLiveScore = scoreService.getTotalScoreForLiveUser(userId);
+        return ResponseEntity.ok().body(totalLiveScore);
+    }
 
+    // Add this after the getTotalLiveScoreForUser method and before the leaderboard section
+    @GetMapping("/live-activities/{liveActivityId}/total-score")
+    @Operation(
+        summary = "Get total score for a live activity",
+        description = "Calculates and retrieves the total possible score for a specific live activity",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Live activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<Integer> getTotalScoreForLiveActivity(@PathVariable int liveActivityId) {
+        int totalScore = scoreService.getTotalScoreForLiveActivity(liveActivityId);
+        return ResponseEntity.ok().body(totalScore);
+    }
 
 
     // Leaderboard
@@ -253,29 +293,7 @@ public class ScoreController {
     public ResponseEntity<Map<String, Double>> getActivityScoreStatistics(@PathVariable int activityId) {
         Map<String, Double> statistics = scoreService.getActivityScoreStatistics(activityId);
         return ResponseEntity.ok().body(statistics);
-    }
-
-    // Score Status for Live Activity
-    @GetMapping("/users/{userId}/pass-status")
-    @Operation(
-        summary = "Get user's pass/fail status",
-        description = "Determines if a user passed based on 70% passing rate of total score",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "User not found",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            )
-        }
-    )
-    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
-    public ResponseEntity<Map<String, Object>> getUserPassStatus(@PathVariable int userId) {
-        Map<String, Object> status = scoreService.getUserPassStatus(userId);
-        return ResponseEntity.ok().body(status);
-    }
-    
+    }   
 
 
 }
