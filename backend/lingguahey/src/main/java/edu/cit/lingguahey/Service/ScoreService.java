@@ -146,8 +146,16 @@ public class ScoreService {
     public int getTotalScoreForUser(int userId) {
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        
         return userScoreRepo.findByUser_UserId(userId).stream()
-            .mapToInt(userScore -> userScore.getScore())
+            .filter(userScore -> {
+                QuestionEntity question = userScore.getQuestion();
+                // Only include scores from questions that belong to LessonActivities
+                return question != null && 
+                    question.getActivity() != null && 
+                    question.getLiveActivity() == null;
+            })
+            .mapToInt(UserScore::getScore)
             .sum();
     }
 

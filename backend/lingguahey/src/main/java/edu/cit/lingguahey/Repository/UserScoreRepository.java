@@ -15,7 +15,7 @@ import edu.cit.lingguahey.model.UserScoreProjection;
 @Repository
 public interface UserScoreRepository extends JpaRepository<UserScore, Integer> {
     Optional<UserScore> findByUser_UserIdAndQuestion_QuestionId(int userId, int questionId);
-    List<UserScoreProjection> findByUser_UserId(int userId);
+    List<UserScore> findByUser_UserId(int userId);
     List<UserScore> findByScoreEntity_ScoreId(int scoreId);
     List<UserScore> findByQuestion_QuestionId(int questionId);
 
