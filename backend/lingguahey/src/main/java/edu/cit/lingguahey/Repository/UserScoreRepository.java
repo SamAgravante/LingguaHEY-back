@@ -43,4 +43,7 @@ public interface UserScoreRepository extends JpaRepository<UserScore, Integer> {
         ORDER BY totalScore DESC
     """)
     List<LeaderboardEntry> findLeaderboardByLiveActivity(@Param("activityId") int activityId);
+
+    @Query("SELECT us.score FROM UserScore us WHERE us.question.liveActivity.id = :activityId")
+    List<Integer> findScoresByActivityId(@Param("activityId") int activityId);
 }

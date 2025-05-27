@@ -1,7 +1,7 @@
 package edu.cit.lingguahey.Controller;
 
 import java.util.List;
-
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -207,7 +207,7 @@ public class ScoreController {
             )
         }
     )
-    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read')")
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
     public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
         int totalScore = scoreService.getTotalScoreForUser(userId);
         return ResponseEntity.ok().body(totalScore);
@@ -234,5 +234,48 @@ public class ScoreController {
         List<LeaderboardEntry> leaderboard = scoreService.getLiveActivityLeaderboard(activityId);
         return ResponseEntity.ok().body(leaderboard);
     }
+
+    //Scores in live activity
+    @GetMapping("/live-activities/{activityId}/stats")
+    @Operation(
+        summary = "Get score statistics for a live activity",
+        description = "Retrieves the average, lowest, and highest scores for a specific live activity",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Activity not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<Map<String, Double>> getActivityScoreStatistics(@PathVariable int activityId) {
+        Map<String, Double> statistics = scoreService.getActivityScoreStatistics(activityId);
+        return ResponseEntity.ok().body(statistics);
+    }
+
+    // Score Status for Live Activity
+    @GetMapping("/users/{userId}/pass-status")
+    @Operation(
+        summary = "Get user's pass/fail status",
+        description = "Determines if a user passed based on 70% passing rate of total score",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
+    public ResponseEntity<Map<String, Object>> getUserPassStatus(@PathVariable int userId) {
+        Map<String, Object> status = scoreService.getUserPassStatus(userId);
+        return ResponseEntity.ok().body(status);
+    }
+    
+
 
 }

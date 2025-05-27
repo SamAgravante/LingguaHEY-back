@@ -1,6 +1,9 @@
 package edu.cit.lingguahey.Service;
 
+import java.util.DoubleSummaryStatistics;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +180,46 @@ public class ScoreService {
         } else {
             System.out.println("No user scores found to clear for Live Activity ID: " + liveActivityId);
         }
+    }
+    
+    public Map<String, Double> getActivityScoreStatistics(int activityId) {
+        Map<String, Double> statistics = new HashMap<>();
+        
+        List<Integer> scores = userScoreRepo.findScoresByActivityId(activityId);
+        
+        if (scores.isEmpty()) {
+            statistics.put("average", 0.0);
+            statistics.put("highest", 0.0);
+            statistics.put("lowest", 0.0);
+            return statistics;
+        }
+        
+        DoubleSummaryStatistics stats = scores.stream()
+            .mapToDouble(Integer::doubleValue)
+            .summaryStatistics();
+            
+        statistics.put("average", stats.getAverage());
+        statistics.put("highest", stats.getMax());
+        statistics.put("lowest", stats.getMin());
+        
+        return statistics;
+    }
+
+    //Score status for Live Activity
+    public Map<String, Object> getUserPassStatus(int userId) {
+        int totalScore = getTotalScoreForUser(userId);
+        int maxPossibleScore = scoreRepo.getMaxPossibleScore(userId);
+        double passingScore = maxPossibleScore * 0.70; // 70% passing rate
+        boolean passed = totalScore >= passingScore;
+        
+        Map<String, Object> status = new HashMap<>();
+        status.put("passed", passed);
+        status.put("userScore", totalScore);
+        status.put("maxPossibleScore", maxPossibleScore);
+        status.put("requiredScore", passingScore);
+        status.put("passingRate", "70%");
+        
+        return status;
     }
 }
 
