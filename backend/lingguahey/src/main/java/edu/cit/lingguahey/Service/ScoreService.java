@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.ScoreEntity;
@@ -163,6 +164,19 @@ public class ScoreService {
     // Leaderboard
     public List<LeaderboardEntry> getLiveActivityLeaderboard(int activityId) {
         return userScoreRepo.findLeaderboardByLiveActivity(activityId);
+    }
+
+    @Transactional
+    public void clearScoresForLiveActivity(int liveActivityId) {
+        // Find all UserScore entries where the associated Question belongs to the given LiveActivity
+        List<UserScore> userScoresToClear = userScoreRepo.findByQuestion_LiveActivity_ActivityId(liveActivityId);
+        
+        if (!userScoresToClear.isEmpty()) {
+            userScoreRepo.deleteAll(userScoresToClear);
+            System.out.println("Cleared " + userScoresToClear.size() + " user scores for Live Activity ID: " + liveActivityId);
+        } else {
+            System.out.println("No user scores found to clear for Live Activity ID: " + liveActivityId);
+        }
     }
 }
 

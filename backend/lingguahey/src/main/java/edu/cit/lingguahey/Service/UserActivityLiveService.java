@@ -41,6 +41,9 @@ public class UserActivityLiveService {
     @Autowired
     private LiveActivityService liveActivityService;
 
+    @Autowired
+    private ScoreService scoreService;
+
     public ResponseEntity<?> joinLobby(int activityId, int userId) {
         // Use the Optional-based repository method
         Optional<UserActivityLive> existingEntryOpt = userActivityLiveRepository
@@ -84,6 +87,11 @@ public class UserActivityLiveService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Only teacher can start activity");
         }
 
+        if (activity.isDeployed()) {
+            System.out.println("Live activity ID " + activityId + " is already deployed. Clearing previous scores for rerun.");
+            scoreService.clearScoresForLiveActivity(activityId);
+        }
+
         List<UserActivityLive> lobbyEntries = userActivityLiveRepository
             .findByActivity_ActivityIdAndInLobby(activityId, true);
 
@@ -117,7 +125,8 @@ public class UserActivityLiveService {
         if (!activity.isDeployed()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Activity is not currently deployed/running.");
         }
-        
+
+        scoreService.clearScoresForLiveActivity(activityId);
         liveActivityService.setActivityDeployedStatus(activityId, false);
         List<UserActivityLive> activeEntries = userActivityLiveRepository.findByActivity_ActivityId(activityId);
         userActivityLiveRepository.deleteAll(activeEntries);
