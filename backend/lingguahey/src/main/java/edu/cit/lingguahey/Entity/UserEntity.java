@@ -29,10 +29,13 @@ import jakarta.persistence.TemporalType;
 import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class UserEntity implements UserDetails {
     @Id
@@ -47,6 +50,8 @@ public class UserEntity implements UserDetails {
     private String password;
     private String idNumber;
     private int totalPoints;
+    private int currency;
+    
     @Builder.Default
     private boolean subscriptionStatus = false;
     
@@ -123,6 +128,21 @@ public class UserEntity implements UserDetails {
     }
 
     //Entity Relations
+
+    @ManyToMany
+    @JoinTable(
+        name = "user_cosmetics",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "cosmetic_id")
+    )
+    @JsonIgnore
+    private List<CosmeticEntity> inventory;
+
+    @ManyToOne
+    @JoinColumn(name = "equipped_cosmetic_id")
+    @JsonIgnore
+    private CosmeticEntity equippedCosmetic;
+
     @ManyToOne
     @JoinColumn(name = "classroom_id")
     //@JsonBackReference(value = "classroom-users")
@@ -151,12 +171,13 @@ public class UserEntity implements UserDetails {
     @JoinColumn(name = "activity_id")
     @JsonBackReference(value = "live-users")
     private LiveActivityEntity liveActivity;
-
+    /*
     public UserEntity(){
         super();
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, Role role, Date createdAt) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, int currency, List<CosmeticEntity> inventory, 
+        Role role, Date createdAt) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -164,12 +185,14 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.currency = currency;
+        this.inventory = inventory;
         this.role = role;
         this.createdAt = createdAt;
     }
 
-    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, boolean subscriptionStatus, boolean subscriptionType, 
-            Date subscriptionEndDate, int profilePic, Role role, Date createdAt) {
+    public UserEntity(String firstName, String middleName, String lastName, String email, String password, String idNumber, int totalPoints, int currency, List<CosmeticEntity> inventory, 
+        boolean subscriptionStatus, boolean subscriptionType, Date subscriptionEndDate, int profilePic, Role role, Date createdAt) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -177,6 +200,8 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.currency = currency;
+        this.inventory = inventory;
         this.subscriptionStatus = subscriptionStatus;
         this.profilePic = profilePic;
         this.role = role;
@@ -184,7 +209,7 @@ public class UserEntity implements UserDetails {
     }
     
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email, 
-            String password, String idNumber, int totalPoints, boolean subscriptionStatus, 
+            String password, String idNumber, int totalPoints, int currency, List<CosmeticEntity> inventory, boolean subscriptionStatus, 
             SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate, 
             int profilePic, Role role, List<Token> tokens, ClassroomEntity classroom, 
             List<ScoreEntity> scores, List<ClassroomEntity> classrooms, 
@@ -197,6 +222,8 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.currency = currency;
+        this.inventory = inventory;
         this.subscriptionStatus = subscriptionStatus;
         this.subscriptionType = subscriptionType;
         this.subscriptionStartDate = subscriptionStartDate;
@@ -213,7 +240,7 @@ public class UserEntity implements UserDetails {
     }
 
     public UserEntity(int userId, String firstName, String middleName, String lastName, String email,
-                      String password, String idNumber, int totalPoints, boolean subscriptionStatus,
+                      String password, String idNumber, int totalPoints, int currency, List<CosmeticEntity> inventory, boolean subscriptionStatus,
                       SubscriptionType subscriptionType, Date subscriptionStartDate, Date subscriptionEndDate,
                       Date createdAt, int profilePic, Role role, List<Token> tokens, ClassroomEntity classroom,
                       List<ScoreEntity> scores, List<ClassroomEntity> classrooms,
@@ -226,6 +253,8 @@ public class UserEntity implements UserDetails {
         this.password = password;
         this.idNumber = idNumber;
         this.totalPoints = totalPoints;
+        this.currency = currency;
+        this.inventory = inventory;
         this.subscriptionStatus = subscriptionStatus;
         this.subscriptionType = subscriptionType;
         this.subscriptionStartDate = subscriptionStartDate;
@@ -240,7 +269,7 @@ public class UserEntity implements UserDetails {
         this.activities = activities;
         this.liveActivity = liveActivity;
     }
-
+    */
     public int getUserId() {
         return userId;
     }
@@ -300,6 +329,30 @@ public class UserEntity implements UserDetails {
 
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
+    }
+
+    public int getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(int currency) {
+        this.currency = currency;
+    }
+
+    public List<CosmeticEntity> getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(List<CosmeticEntity> inventory) {
+        this.inventory = inventory;
+    }
+
+    public CosmeticEntity getEquippedCosmetic() {
+        return equippedCosmetic;
+    }
+
+    public void setEquippedCosmetic(CosmeticEntity equippedCosmetic) {
+        this.equippedCosmetic = equippedCosmetic;
     }
 
     public boolean getSubscriptionStatus() {

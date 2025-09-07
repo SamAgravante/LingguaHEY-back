@@ -1,0 +1,82 @@
+package edu.cit.lingguahey.Service;
+
+import java.util.List;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import edu.cit.lingguahey.Entity.CosmeticEntity;
+import edu.cit.lingguahey.Entity.Rarity;
+import edu.cit.lingguahey.Entity.UserEntity;
+import edu.cit.lingguahey.Repository.CosmeticRepository;
+import edu.cit.lingguahey.Repository.UserRepository;
+import edu.cit.lingguahey.model.GachaPullResponse;
+import jakarta.persistence.EntityNotFoundException;
+
+@Service
+public class GachaSystemService {
+
+    @Autowired
+    private CosmeticRepository cosmeticRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public GachaPullResponse performGachaPull(int userId) {
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        final int pullCost = 100;
+        final double rebatePercentage = 0.10;
+        if (user.getCurrency() < pullCost) {
+            throw new IllegalArgumentException("Not enough currency.");
+        }
+
+        user.setCurrency(user.getCurrency() - pullCost);
+
+        Rarity pulledRarity = determineRarity();
+        CosmeticEntity pulledCosmetic = getRandomCosmeticByRarity(pulledRarity);
+
+        if (pulledCosmetic != null) {
+            if (user.getInventory().contains(pulledCosmetic)) {
+                int rebateAmount = (int) (pullCost * rebatePercentage);
+                user.setCurrency(user.getCurrency() + rebateAmount);
+                userRepository.save(user);
+                System.out.println("User " + user.getUserId() + " pulled a duplicate. Received " + rebateAmount + " currency back.");
+                return new GachaPullResponse("Duplicate", pulledCosmetic);
+            } else {
+                user.getInventory().add(pulledCosmetic);
+                userRepository.save(user);
+                System.out.println("User " + user.getUserId() + " pulled a new " + pulledCosmetic.getRarity() + " item: " + pulledCosmetic.getName());
+                return new GachaPullResponse("Success", pulledCosmetic);
+            }
+        } else {
+            return new GachaPullResponse("Failed to find a cosmetic.", null);
+        }
+    }
+
+    private Rarity determineRarity() {
+        double chance = new Random().nextDouble() * 100;
+
+        if (chance < Rarity.MYTHIC.getPullChance()) {
+            return Rarity.MYTHIC;
+        } else if (chance < Rarity.MYTHIC.getPullChance() + Rarity.LEGENDARY.getPullChance()) {
+            return Rarity.LEGENDARY;
+        } else if (chance < Rarity.MYTHIC.getPullChance() + Rarity.LEGENDARY.getPullChance() + Rarity.RARE.getPullChance()) {
+            return Rarity.RARE;
+        } else {
+            return Rarity.COMMON;
+        }
+    }
+
+    private CosmeticEntity getRandomCosmeticByRarity(Rarity rarity) {
+        List<CosmeticEntity> pool = cosmeticRepository.findByRarity(rarity);
+        if (pool.isEmpty()) {
+            return null;
+        }
+        return pool.get(new Random().nextInt(pool.size()));
+    }
+}

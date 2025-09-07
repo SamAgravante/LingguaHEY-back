@@ -131,6 +131,13 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .requestMatchers(PUT, "/api/lingguahey/lobby/**").hasAnyAuthority(ADMIN_UPDATE.getPermission(), USER_UPDATE.getPermission(), TEACHER_UPDATE.getPermission())
                 .requestMatchers(DELETE, "/api/lingguahey/lobby/**").hasAnyAuthority(ADMIN_DELETE.getPermission(), USER_DELETE.getPermission(), TEACHER_DELETE.getPermission())
 
+                //Gacha
+                .requestMatchers(POST, "/api/lingguahey/gacha/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), USER_CREATE.getPermission(), TEACHER_CREATE.getPermission())
+
+                //Inventory
+                .requestMatchers(GET, "/api/lingguahey/inventory/**").hasAnyAuthority(ADMIN_READ.getPermission(), USER_READ.getPermission(), TEACHER_READ.getPermission())
+                .requestMatchers(POST, "/api/lingguahey/inventory/**").hasAnyAuthority(ADMIN_CREATE.getPermission(), USER_CREATE.getPermission(), TEACHER_CREATE.getPermission())
+
                 .anyRequest()
                 .authenticated()
             )

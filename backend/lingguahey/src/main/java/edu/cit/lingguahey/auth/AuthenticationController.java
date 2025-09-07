@@ -91,17 +91,17 @@ public class AuthenticationController {
             AuthenticationResponse authResponse = authService.authenticate(request);
             return ResponseEntity.ok(authResponse);
         } catch (DisabledException e) {
-    return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(new ErrorResponse("Your account is not yet verified. Please check your email for the verification link."));
+            return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse("Account Disabled", "Your account is not yet verified. Please check your email for the verification link."));
         } catch (BadCredentialsException e) {
             return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse("Incorrect email or password."));
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("Authentication Failed", "Incorrect email or password."));
         } catch (Exception e) {
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse("An unexpected error occurred during login."));
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResponse("Internal Server Error", "An unexpected error occurred during login."));
         }
     }
 
