@@ -16,13 +16,13 @@ import jakarta.persistence.EntityNotFoundException;
 public class InventoryService {
     
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepo;
 
     @Autowired
-    private CosmeticRepository cosmeticRepository;
+    private CosmeticRepository cosmeticRepo;
 
     public List<CosmeticEntity> getUserInventory(int userId) {
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
         return user.getInventory();
@@ -30,10 +30,10 @@ public class InventoryService {
     
     @Transactional
     public void equipCosmetic(int userId, int cosmeticId) {
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
-        CosmeticEntity cosmetic = cosmeticRepository.findById(cosmeticId)
+        CosmeticEntity cosmetic = cosmeticRepo.findById(cosmeticId)
                 .orElseThrow(() -> new EntityNotFoundException("Cosmetic not found with ID: " + cosmeticId));
 
         if (!user.getInventory().contains(cosmetic)) {
@@ -41,6 +41,6 @@ public class InventoryService {
         }
 
         user.setEquippedCosmetic(cosmetic);
-        userRepository.save(user);
+        userRepo.save(user);
     }
 }

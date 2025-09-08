@@ -19,23 +19,23 @@ import jakarta.persistence.EntityNotFoundException;
 public class GachaSystemService {
 
     @Autowired
-    private CosmeticRepository cosmeticRepository;
+    private CosmeticRepository cosmeticRepo;
     
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepo;
 
     @Transactional
     public GachaPullResponse performGachaPull(int userId) {
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
         final int pullCost = 100;
         final double rebatePercentage = 0.10;
-        if (user.getCurrency() < pullCost) {
-            throw new IllegalArgumentException("Not enough currency.");
+        if (user.getGems() < pullCost) {
+            throw new IllegalArgumentException("Not enough gems.");
         }
 
-        user.setCurrency(user.getCurrency() - pullCost);
+        user.setGems(user.getGems() - pullCost);
 
         Rarity pulledRarity = determineRarity();
         CosmeticEntity pulledCosmetic = getRandomCosmeticByRarity(pulledRarity);
@@ -43,13 +43,13 @@ public class GachaSystemService {
         if (pulledCosmetic != null) {
             if (user.getInventory().contains(pulledCosmetic)) {
                 int rebateAmount = (int) (pullCost * rebatePercentage);
-                user.setCurrency(user.getCurrency() + rebateAmount);
-                userRepository.save(user);
-                System.out.println("User " + user.getUserId() + " pulled a duplicate. Received " + rebateAmount + " currency back.");
+                user.setGems(user.getGems() + rebateAmount);
+                userRepo.save(user);
+                System.out.println("User " + user.getUserId() + " pulled a duplicate. Received " + rebateAmount + " gems back.");
                 return new GachaPullResponse("Duplicate", pulledCosmetic);
             } else {
                 user.getInventory().add(pulledCosmetic);
-                userRepository.save(user);
+                userRepo.save(user);
                 System.out.println("User " + user.getUserId() + " pulled a new " + pulledCosmetic.getRarity() + " item: " + pulledCosmetic.getName());
                 return new GachaPullResponse("Success", pulledCosmetic);
             }
@@ -73,7 +73,7 @@ public class GachaSystemService {
     }
 
     private CosmeticEntity getRandomCosmeticByRarity(Rarity rarity) {
-        List<CosmeticEntity> pool = cosmeticRepository.findByRarity(rarity);
+        List<CosmeticEntity> pool = cosmeticRepo.findByRarity(rarity);
         if (pool.isEmpty()) {
             return null;
         }

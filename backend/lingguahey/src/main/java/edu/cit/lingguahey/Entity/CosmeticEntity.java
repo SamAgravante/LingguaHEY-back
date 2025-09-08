@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -29,13 +30,18 @@ public class CosmeticEntity {
     @Enumerated(EnumType.STRING)
     private Rarity rarity;
 
+    @Lob
+    @Column(name = "cosmetic_image", columnDefinition = "MEDIUMBLOB", nullable = true)
+    private byte[] cosmeticImage;
+
     public CosmeticEntity() {
         super();
     }
 
-    public CosmeticEntity(String name, Rarity rarity) {
+    public CosmeticEntity(String name, Rarity rarity, byte[] cosmeticImage) {
         this.name = name;
         this.rarity = rarity;
+        this.cosmeticImage = cosmeticImage;
     }
 
 }

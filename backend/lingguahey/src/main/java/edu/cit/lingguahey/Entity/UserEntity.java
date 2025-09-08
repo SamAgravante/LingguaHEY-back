@@ -2,6 +2,7 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import edu.cit.lingguahey.token.Token;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -23,6 +26,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -50,7 +54,17 @@ public class UserEntity implements UserDetails {
     private String password;
     private String idNumber;
     private int totalPoints;
-    private int currency;
+
+    @Builder.Default
+    private int gems = 0;
+    @Builder.Default
+    private int coins = 0;
+
+    @ElementCollection
+    @CollectionTable(name = "user_potions", joinColumns = @JoinColumn(name = "user_id"))
+    @MapKeyColumn(name = "potion_name")
+    @Column(name = "quantity")
+    private Map<String, Integer> potions;
     
     @Builder.Default
     private boolean subscriptionStatus = false;
@@ -330,13 +344,29 @@ public class UserEntity implements UserDetails {
     public void setTotalPoints(int totalPoints) {
         this.totalPoints = totalPoints;
     }
-
-    public int getCurrency() {
-        return currency;
+    
+    public int getGems() {
+        return gems;
     }
 
-    public void setCurrency(int currency) {
-        this.currency = currency;
+    public void setGems(int gems) {
+        this.gems = gems;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public Map<String, Integer> getPotions() {
+        return potions;
+    }
+
+    public void setPotions(Map<String, Integer> potions) {
+        this.potions = potions;
     }
 
     public List<CosmeticEntity> getInventory() {

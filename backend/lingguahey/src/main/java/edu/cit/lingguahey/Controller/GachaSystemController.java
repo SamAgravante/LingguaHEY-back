@@ -30,7 +30,7 @@ public class GachaSystemController {
     @PostMapping("/pull")
     @Operation(
         summary = "Perform a gacha pull for a user",
-        description = "Deducts currency from a user's account and gives them a random cosmetic based on rarity chances.",
+        description = "Deducts gems from a user's account and gives them a random cosmetic based on rarity chances.",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "The user's ID to perform the gacha pull.",
             required = true,
@@ -39,7 +39,7 @@ public class GachaSystemController {
         responses = {
             @ApiResponse(responseCode = "200", description = "Pull successful, returns the pulled cosmetic.",
                 content = @Content(schema = @Schema(implementation = GachaPullResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Bad Request: Not enough currency.",
+            @ApiResponse(responseCode = "400", description = "Bad Request: Not enough gems.",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Not Found: User not found.",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -59,7 +59,7 @@ public class GachaSystemController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse("Not enough currency", e.getMessage()));
+                .body(new ErrorResponse("Not enough gems", e.getMessage()));
         }
     }
 }

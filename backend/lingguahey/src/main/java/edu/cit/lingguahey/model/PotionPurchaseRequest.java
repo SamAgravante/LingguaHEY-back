@@ -1,11 +1,13 @@
 package edu.cit.lingguahey.model;
 
+import edu.cit.lingguahey.Entity.PotionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GachaPullRequest {
+public class PotionPurchaseRequest {
     private int userId;
-    //private String pullType;
+    private PotionType potionType;
+    private int cost;
 }
