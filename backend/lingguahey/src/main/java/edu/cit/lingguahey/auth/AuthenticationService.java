@@ -7,12 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.Role;
-import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
-import edu.cit.lingguahey.Repository.UserActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.config.JwtService;
 import edu.cit.lingguahey.token.Token;
@@ -31,7 +28,6 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ClassroomUserRepository classroomUserRepo;
-    private final UserActivityRepository userActivityRepo;
     private final EmailService emailService;
     @Value("${app.base-url}")
     private String baseUrl;
@@ -39,14 +35,13 @@ public class AuthenticationService {
     public AuthenticationService(UserRepository repository, TokenRepository tokenRepository,
             PasswordEncoder passwordEncoder, JwtService jwtService,
             AuthenticationManager authenticationManager, ClassroomUserRepository classroomUserRepo,
-            UserActivityRepository userActivityRepo, EmailService emailService) {
+            EmailService emailService) {
         this.repository = repository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.classroomUserRepo = classroomUserRepo;
-        this.userActivityRepo = userActivityRepo;
         this.emailService = emailService;
     }
 

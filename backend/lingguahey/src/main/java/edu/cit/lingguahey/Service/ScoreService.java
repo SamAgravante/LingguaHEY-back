@@ -42,7 +42,7 @@ public class ScoreService {
     // Create and Add Score to Question
     public ScoreEntity setScoreForQuestion(int questionId, int scoreValue) {
         QuestionEntity question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         if (question.getScore() != null) {
             throw new IllegalStateException("Score already exists for this question");
         }
@@ -66,12 +66,12 @@ public class ScoreService {
     // Update
     public ScoreEntity putScoreEntity(int scoreId, ScoreEntity newScore) {
         try {
-        ScoreEntity score = scoreRepo.findById(scoreId).get();
-        score.setScore(newScore.getScore());
-        if (score.getQuestion() != null) {
-            score.getQuestion().setScore(newScore);
-        }
-        return scoreRepo.save(score);
+            ScoreEntity score = scoreRepo.findById(scoreId).get();
+            score.setScore(newScore.getScore());
+            if (score.getQuestion() != null) {
+                score.getQuestion().setScore(newScore);
+            }
+            return scoreRepo.save(score);
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("Score " + scoreId + " not found!");
         }
@@ -80,7 +80,7 @@ public class ScoreService {
     // Update Score for Question
     public ScoreEntity updateScoreForQuestion(int questionId, int newScoreValue) {
         QuestionEntity question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         ScoreEntity score = question.getScore();
         if (score == null) {
             throw new EntityNotFoundException("No score found for the question with ID: " + questionId);
@@ -105,20 +105,20 @@ public class ScoreService {
     // Give Score to User
     public void awardScoreToUser(int questionId, int userId, int selectedChoiceId) {
         QuestionEntity question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
         boolean isCorrectChoice = question.getChoices().stream()
-            .anyMatch(choice -> choice.getChoiceId() == selectedChoiceId && choice.isCorrect());
+                .anyMatch(choice -> choice.getChoiceId() == selectedChoiceId && choice.isCorrect());
         if (!isCorrectChoice) {
             throw new IllegalArgumentException("The selected choice is incorrect.");
         }
 
         userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
-            .ifPresent(existing -> {
-                throw new IllegalStateException("User already has a score for this question.");
-            });
+                .ifPresent(existing -> {
+                    throw new IllegalStateException("User already has a score for this question.");
+                });
 
         UserScore userScore = new UserScore(user, question, question.getScore().getScore());
         userScoreRepo.save(userScore);
@@ -127,72 +127,76 @@ public class ScoreService {
     // Give Score to User for Translation Game
     public void awardScoreToUserForTranslationGame(int questionId, int userId, List<Integer> choiceIds) {
         QuestionEntity question = questionRepo.findById(questionId)
-            .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
+                .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-    
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
         boolean isCorrectChoice = choiceServ.validateTranslationGame(questionId, choiceIds);
         if (!isCorrectChoice) {
             throw new IllegalArgumentException("The selected choices are not in the correct order.");
         }
-    
+
         userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
-            .ifPresent(existing -> {
-                throw new IllegalStateException("User already has a score for this question.");
-            });
-    
+                .ifPresent(existing -> {
+                    throw new IllegalStateException("User already has a score for this question.");
+                });
+
         UserScore userScore = new UserScore(user, question, question.getScore().getScore());
         userScoreRepo.save(userScore);
     }
 
     // Total Score for User
-    @SuppressWarnings("unused")
-    public int getTotalScoreForUser(int userId) {
-        UserEntity user = userRepo.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        
-        return userScoreRepo.findByUser_UserId(userId).stream()
-            .filter(userScore -> {
-                QuestionEntity question = userScore.getQuestion();
-                // Only include scores from questions that belong to LessonActivities
-                return question != null && 
-                    question.getActivity() != null && 
-                    question.getLiveActivity() == null;
-            })
-            .mapToInt(UserScore::getScore)
-            .sum();
-    }
-    
+
+    // COMMENTED OUT KAY I THINK PARA NI SA LESSON ACTIVITIES
+
+    /*
+     * @SuppressWarnings("unused")
+     * public int getTotalScoreForUser(int userId) {
+     * UserEntity user = userRepo.findById(userId)
+     * .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +
+     * userId));
+     * 
+     * return userScoreRepo.findByUser_UserId(userId).stream()
+     * .filter(userScore -> {
+     * QuestionEntity question = userScore.getQuestion();
+     * // Only include scores from questions that belong to LessonActivities
+     * return question != null &&
+     * question.getActivity() != null &&
+     * question.getLiveActivity() == null;
+     * })
+     * .mapToInt(UserScore::getScore)
+     * .sum();
+     * }
+     */
+
     // Total Score for User (for Live Activities)
     @SuppressWarnings("unused")
     public int getTotalScoreForLiveUser(int userId) {
         UserEntity user = userRepo.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
         return userScoreRepo.findByUser_UserId(userId).stream()
-            .filter(userScore -> {
-                QuestionEntity question = userScore.getQuestion();
-                // Only include scores from questions that belong to LessonActivities
-                return question != null && 
-                    question.getActivity() == null && 
-                    question.getLiveActivity() != null;
-            })
-            .mapToInt(UserScore::getScore)
-            .sum();
+                .filter(userScore -> {
+                    QuestionEntity question = userScore.getQuestion();
+                    // Only include scores from questions that belong to LessonActivities
+                    // Edited this part to remove unnecessary lesson activity check
+                    return question != null && question.getLiveActivity() != null;
+                })
+                .mapToInt(UserScore::getScore)
+                .sum();
     }
 
     // Total Score for Live Activity
     public int getTotalScoreForLiveActivity(int liveActivityId) {
-    // Find all questions for the live activity
-    List<QuestionEntity> questions = questionRepo.findByLiveActivity_ActivityId(liveActivityId);
-    
-    // Sum up all scores from the questions
-    return questions.stream()
-        .filter(question -> question.getScore() != null)
-        .mapToInt(question -> question.getScore().getScore())
-        .sum();
-    }
+        // Find all questions for the live activity
+        List<QuestionEntity> questions = questionRepo.findByLiveActivity_ActivityId(liveActivityId);
 
+        // Sum up all scores from the questions
+        return questions.stream()
+                .filter(question -> question.getScore() != null)
+                .mapToInt(question -> question.getScore().getScore())
+                .sum();
+    }
 
     // Leaderboard
     public List<LeaderboardEntry> getLiveActivityLeaderboard(int activityId) {
@@ -201,40 +205,41 @@ public class ScoreService {
 
     @Transactional
     public void clearScoresForLiveActivity(int liveActivityId) {
-        // Find all UserScore entries where the associated Question belongs to the given LiveActivity
+        // Find all UserScore entries where the associated Question belongs to the given
+        // LiveActivity
         List<UserScore> userScoresToClear = userScoreRepo.findByQuestion_LiveActivity_ActivityId(liveActivityId);
-        
+
         if (!userScoresToClear.isEmpty()) {
             userScoreRepo.deleteAll(userScoresToClear);
-            System.out.println("Cleared " + userScoresToClear.size() + " user scores for Live Activity ID: " + liveActivityId);
+            System.out.println(
+                    "Cleared " + userScoresToClear.size() + " user scores for Live Activity ID: " + liveActivityId);
         } else {
             System.out.println("No user scores found to clear for Live Activity ID: " + liveActivityId);
         }
     }
-    
-    //Live Activity Score Statistics
+
+    // Live Activity Score Statistics
     public Map<String, Double> getActivityScoreStatistics(int activityId) {
         Map<String, Double> statistics = new HashMap<>();
-        
+
         List<Integer> scores = userScoreRepo.findScoresByActivityId(activityId);
-        
+
         if (scores.isEmpty()) {
             statistics.put("average", 0.0);
             statistics.put("highest", 0.0);
             statistics.put("lowest", 0.0);
             return statistics;
         }
-        
+
         DoubleSummaryStatistics stats = scores.stream()
-            .mapToDouble(Integer::doubleValue)
-            .summaryStatistics();
-            
+                .mapToDouble(Integer::doubleValue)
+                .summaryStatistics();
+
         statistics.put("average", stats.getAverage());
         statistics.put("highest", stats.getMax());
         statistics.put("lowest", stats.getMin());
-        
+
         return statistics;
     }
 
 }
-
