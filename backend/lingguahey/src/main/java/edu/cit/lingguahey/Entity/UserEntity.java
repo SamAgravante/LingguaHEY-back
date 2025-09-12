@@ -177,9 +177,6 @@ public class UserEntity implements UserDetails {
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "activity_id")
     )
-    //@JsonManagedReference
-    @JsonIgnore
-    private List<LessonActivityEntity> activities;
 
     @ManyToOne
     @JoinColumn(name = "activity_id")

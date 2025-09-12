@@ -29,11 +29,6 @@ public class ClassroomEntity {
     @JsonIgnore
     private List<UserEntity> users;
 
-    @OneToMany(mappedBy = "lessonClassroom")
-    //@JsonManagedReference(value = "classroom-activities")
-    @JsonIgnore
-    private List<LessonActivityEntity> lessons;
-
     @OneToMany(mappedBy = "activityClassroom")
     //@JsonManagedReference(value = "classroom-liveactivities")
     @JsonIgnore
@@ -70,14 +65,6 @@ public class ClassroomEntity {
 
     public void setUsers(List<UserEntity> users) {
         this.users = users;
-    }
-
-    public List<LessonActivityEntity> getLessons() {
-        return lessons;
-    }
-
-    public void setLessons(List<LessonActivityEntity> lessons) {
-        this.lessons = lessons;
     }
 
     public List<LiveActivityEntity> getActivities() {

@@ -4,11 +4,10 @@ import edu.cit.lingguahey.Entity.ChoiceEntity;
 import edu.cit.lingguahey.Entity.ClassroomActivityLive;
 import edu.cit.lingguahey.Entity.ClassroomEntity;
 import edu.cit.lingguahey.Entity.ClassroomUser;
-import edu.cit.lingguahey.Entity.LessonActivityEntity;
+
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.Role;
-import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserActivityLive;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
@@ -18,7 +17,6 @@ import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
-import edu.cit.lingguahey.Repository.UserActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -50,8 +48,6 @@ public class ClassroomService {
     @Autowired
     private LiveActivityRepository liveActivityRepo;
 
-    @Autowired
-    private UserActivityRepository userActivityRepo;
 
     @Autowired
     private UserActivityLiveRepository userActivityLiveRepo;
