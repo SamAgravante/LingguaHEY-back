@@ -59,6 +59,12 @@ public class UserEntity implements UserDetails {
     private int gems = 0;
     @Builder.Default
     private int coins = 0;
+    @Builder.Default
+    private int lives = 4;
+    @Builder.Default
+    private int shield = 0;
+    @Builder.Default
+    private int skipsLeft = 0;
 
     @ElementCollection
     @CollectionTable(name = "user_potions", joinColumns = @JoinColumn(name = "user_id"))
@@ -356,6 +362,30 @@ public class UserEntity implements UserDetails {
 
     public void setCoins(int coins) {
         this.coins = coins;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    public int getShield() {
+        return shield;
+    }
+
+    public void setShield(int shield) {
+        this.shield = shield;
+    }
+
+    public int getSkipsLeft() {
+        return skipsLeft;
+    }
+
+    public void setSkipsLeft(int skipsLeft) {
+        this.skipsLeft = skipsLeft;
     }
 
     public Map<String, Integer> getPotions() {

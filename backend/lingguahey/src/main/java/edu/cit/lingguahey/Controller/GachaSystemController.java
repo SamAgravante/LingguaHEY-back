@@ -3,6 +3,7 @@ package edu.cit.lingguahey.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,7 @@ public class GachaSystemController {
     @Autowired
     private GachaSystemService gachaSystemServ;
 
+    // Gacha Pull
     @PostMapping("/pull")
     @Operation(
         summary = "Perform a gacha pull for a user",
@@ -48,6 +50,7 @@ public class GachaSystemController {
             )
         }
     )
+    @PreAuthorize("#request.userId == principal.userId")
     public ResponseEntity<?> performGachaPull(@RequestBody GachaPullRequest request) {
         try {
             GachaPullResponse response = gachaSystemServ.performGachaPull(request.getUserId());

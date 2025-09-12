@@ -1,0 +1,14 @@
+package edu.cit.lingguahey.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class GuessResponse {
+    private boolean isCorrect;
+    private String feedback;
+    private int heartsLeft;
+    private boolean isGameOver;
+    private String correctAnswer;
+}

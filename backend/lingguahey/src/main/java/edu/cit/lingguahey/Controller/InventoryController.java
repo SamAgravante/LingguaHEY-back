@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +32,7 @@ public class InventoryController {
     @Autowired
     private InventoryService inventoryServ;
 
+    // Read Inventory by id
     @GetMapping("/{userId}")
     @Operation(
         summary = "View user's inventory", 
@@ -45,6 +47,7 @@ public class InventoryController {
             )
         }
     )
+    @PreAuthorize("#userId == principal.userId")
     public ResponseEntity<?> getUserInventory(@PathVariable int userId) {
         try {
             List<CosmeticEntity> inventory = inventoryServ.getUserInventory(userId);
@@ -54,6 +57,7 @@ public class InventoryController {
         }
     }
 
+    // Equip Cosmetic by id
     @PostMapping("/equip")
     @Operation(
         summary = "Equip a cosmetic", 
@@ -71,6 +75,7 @@ public class InventoryController {
             )
         }
     )
+    @PreAuthorize("#request.userId == principal.userId")
     public ResponseEntity<?> equipCosmetic(@RequestBody EquipCosmeticRequest request) {
         try {
             inventoryServ.equipCosmetic(request.getUserId(), request.getCosmeticId());

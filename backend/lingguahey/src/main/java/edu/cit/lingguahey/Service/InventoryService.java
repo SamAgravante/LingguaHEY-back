@@ -21,6 +21,7 @@ public class InventoryService {
     @Autowired
     private CosmeticRepository cosmeticRepo;
 
+    // Read Inventory by id
     public List<CosmeticEntity> getUserInventory(int userId) {
         UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
@@ -28,6 +29,7 @@ public class InventoryService {
         return user.getInventory();
     }
     
+    // Equip Cosmetic by id
     @Transactional
     public void equipCosmetic(int userId, int cosmeticId) {
         UserEntity user = userRepo.findById(userId)
