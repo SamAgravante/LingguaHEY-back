@@ -24,6 +24,7 @@ public class GachaSystemService {
     @Autowired
     private UserRepository userRepo;
 
+    // Gacha Pull
     @Transactional
     public GachaPullResponse performGachaPull(int userId) {
         UserEntity user = userRepo.findById(userId)
@@ -58,6 +59,7 @@ public class GachaSystemService {
         }
     }
 
+    // Gacha Rarity
     private Rarity determineRarity() {
         double chance = new Random().nextDouble() * 100;
 
@@ -72,6 +74,7 @@ public class GachaSystemService {
         }
     }
 
+    // Gacha RNG
     private CosmeticEntity getRandomCosmeticByRarity(Rarity rarity) {
         List<CosmeticEntity> pool = cosmeticRepo.findByRarity(rarity);
         if (pool.isEmpty()) {

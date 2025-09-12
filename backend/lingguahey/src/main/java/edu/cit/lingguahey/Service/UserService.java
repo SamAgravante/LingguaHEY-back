@@ -86,6 +86,8 @@ public class UserService {
             return "User " +userId+ "not found!";
         }
     }
+
+    // Subscritpion
     @Transactional
     public void updateSubscriptionStatus(Integer userId, boolean subscriptionStatus, String subscriptionType) {
         UserEntity user = userRepo.findById(userId)
@@ -150,5 +152,34 @@ public class UserService {
     // Get the count of active tokens
     public long getActiveTokenCount() {
         return tokenRepo.countAllValidTokens();
+    }
+
+    // Life
+    @Transactional
+    public void deductLife(int userId) {
+        UserEntity user = userRepo.findById(userId).get();
+        if (user.getLives() > 0) {
+            user.setLives(user.getLives() - 1);
+        }
+        userRepo.save(user);
+    }
+
+    // Shield
+    @Transactional
+    public void consumeShield(int userId) {
+        UserEntity user = userRepo.findById(userId).get();
+        if (user.getShield() > 0) {
+            user.setShield(user.getShield() - 1);
+        }
+        userRepo.save(user);
+    }
+
+    // Level Rewards
+    @Transactional
+    public void rewardUser(int userId, int coins, int gems) {
+        UserEntity user = userRepo.findById(userId).get();
+        user.setCoins(user.getCoins() + coins);
+        user.setGems(user.getGems() + gems);
+        userRepo.save(user);
     }
 }
