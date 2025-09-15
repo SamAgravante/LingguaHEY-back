@@ -98,7 +98,7 @@ public class GameService {
                             levelMonster.getMonster().getTagalogName(),
                             levelMonster.getMonster().getEnglishName(),
                             levelMonster.getMonster().getDescription(),
-                            levelMonster.getMonster().getImageData().toString(),
+                            levelMonster.getMonster().getImageData(),
                             null
                         );
                     }
@@ -156,7 +156,7 @@ public class GameService {
                 null,
                 monsterToDisplay.getEnglishName(),
                 monsterToDisplay.getDescription(),
-                monsterToDisplay.getImageData().toString(),
+                monsterToDisplay.getImageData(),
                 jumbledLetters
         );
     }

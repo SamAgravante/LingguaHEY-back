@@ -14,6 +14,6 @@ public class MonsterResponse {
     private String tagalogName;
     private String englishName;
     private String description;
-    private String imageData;
+    private byte[] imageData;
     private List<Character> jumbledLetters;
 }

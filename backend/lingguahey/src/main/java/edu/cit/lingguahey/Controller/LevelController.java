@@ -194,10 +194,11 @@ public class LevelController {
                     monsterDetails.setTagalogName(levelMonster.getMonster().getTagalogName());
                     monsterDetails.setDescription(levelMonster.getMonster().getDescription());
                     
-                    if (levelMonster.getMonster().getImageData() != null) {
+                    /*if (levelMonster.getMonster().getImageData() != null) {
                         String base64Image = Base64.getEncoder().encodeToString(levelMonster.getMonster().getImageData());
                         monsterDetails.setImageData(base64Image);
-                    }
+                    }*/
+                    monsterDetails.setImageData(levelMonster.getMonster().getImageData());
                     monsterDto.setMonster(monsterDetails);
                 }
                 
@@ -209,10 +210,11 @@ public class LevelController {
                             formDetails.setMonsterId(bossForm.getMinionMonster().getMonster().getMonsterId());
                             formDetails.setTagalogName(bossForm.getMinionMonster().getMonster().getTagalogName());
                             formDetails.setDescription(bossForm.getMinionMonster().getMonster().getDescription());
-                            if (bossForm.getMinionMonster().getMonster().getImageData() != null) {
+                            /*if (bossForm.getMinionMonster().getMonster().getImageData() != null) {
                                 String base64Image = Base64.getEncoder().encodeToString(bossForm.getMinionMonster().getMonster().getImageData());
                                 formDetails.setImageData(base64Image);
-                            }
+                            }*/
+                            formDetails.setImageData(levelMonster.getMonster().getImageData());
                             return formDetails;
                         })
                         .collect(Collectors.toList());
