@@ -1,7 +1,9 @@
 package edu.cit.lingguahey.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,6 +273,27 @@ public class LevelService {
         return userCompletedLevelRepo.findByUserUserId(userId).stream()
                 .map(UserCompletedLevel::getLevel)
                 .collect(Collectors.toList());
+    }
+
+    // Get a list of unique monsters for a level preview
+    @Transactional(readOnly = true)
+    public Set<MonsterEntity> getUniqueMonstersForLevelPreview(int levelId) {
+        LevelEntity level = levelRepo.findById(levelId)
+            .orElseThrow(() -> new EntityNotFoundException("Level not found with ID: " + levelId));
+
+        Set<MonsterEntity> uniqueMonsters = new HashSet<>();
+
+        level.getLevelMonsters().stream()
+            .filter(levelMonster -> levelMonster.getMonster() != null)
+            .forEach(levelMonster -> uniqueMonsters.add(levelMonster.getMonster()));
+
+        level.getLevelMonsters().stream()
+            .filter(levelMonster -> levelMonster.getMonsterType() == MonsterType.BOSS)
+            .flatMap(levelMonster -> levelMonster.getMinionForms().stream())
+            .filter(bossForm -> bossForm.getMinionMonster() != null && bossForm.getMinionMonster().getMonster() != null)
+            .forEach(bossForm -> uniqueMonsters.add(bossForm.getMinionMonster().getMonster()));
+            
+        return uniqueMonsters;
     }
 
 }

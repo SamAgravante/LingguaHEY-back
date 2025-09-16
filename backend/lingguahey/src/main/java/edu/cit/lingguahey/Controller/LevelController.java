@@ -1,6 +1,7 @@
 package edu.cit.lingguahey.Controller;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.LevelEntity;
+import edu.cit.lingguahey.Entity.MonsterEntity;
 import edu.cit.lingguahey.Entity.MonsterType;
 import edu.cit.lingguahey.Entity.UserCompletedLevel;
 import edu.cit.lingguahey.Service.LevelService;
@@ -245,6 +247,35 @@ public class LevelController {
         }
     }
 
+    // Get a list of unique monsters for a level preview
+    @GetMapping("/{levelId}/monsters/preview")
+    @Operation(
+        summary = "Get unique monsters for level preview",
+        description = "Retrieves a list of unique monsters, including boss forms, for a level preview. Duplicates are removed.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved unique monsters.", 
+                content = @Content(schema = @Schema(implementation = MonsterResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "Level not found.", 
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<?> getUniqueMonstersForLevelPreview(@PathVariable int levelId) {
+        try {
+            Set<MonsterEntity> uniqueMonsters = levelServ.getUniqueMonstersForLevelPreview(levelId);
+            List<MonsterResponse> monsterResponses = uniqueMonsters.stream()
+                .map(this::convertToMonsterDto)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(monsterResponses);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Failed to find level", e.getMessage()));
+        }
+    }
+
     // Helper method to convert an entity to a DTO
     private LevelResponse convertToDto(LevelEntity level) {
         LevelResponse dto = new LevelResponse();
@@ -296,6 +327,16 @@ public class LevelController {
         
         dto.setLevelMonsters(monsterDtos);
         
+        return dto;
+    }
+
+    private MonsterResponse convertToMonsterDto(MonsterEntity monster) {
+        MonsterResponse dto = new MonsterResponse();
+        dto.setMonsterId(monster.getMonsterId());
+        dto.setTagalogName(monster.getTagalogName());
+        dto.setEnglishName(monster.getEnglishName());
+        dto.setDescription(monster.getDescription());
+        dto.setImageData(monster.getImageData());
         return dto;
     }
     
