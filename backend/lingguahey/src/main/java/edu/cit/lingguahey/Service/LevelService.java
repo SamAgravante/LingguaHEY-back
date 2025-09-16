@@ -13,9 +13,13 @@ import edu.cit.lingguahey.Entity.LevelEntity;
 import edu.cit.lingguahey.Entity.LevelMonster;
 import edu.cit.lingguahey.Entity.MonsterEntity;
 import edu.cit.lingguahey.Entity.MonsterType;
+import edu.cit.lingguahey.Entity.UserCompletedLevel;
+import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.BossFormsRepository;
 import edu.cit.lingguahey.Repository.LevelRepository;
 import edu.cit.lingguahey.Repository.MonsterRepository;
+import edu.cit.lingguahey.Repository.UserCompletedLevelRepository;
+import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.model.LevelCreateRequest;
 import edu.cit.lingguahey.model.LevelEditRequest;
 import edu.cit.lingguahey.model.MonsterRequest;
@@ -32,6 +36,12 @@ public class LevelService {
 
     @Autowired
     private BossFormsRepository bossFormsRepo;
+
+    @Autowired
+    private UserRepository userRepo;
+    
+    @Autowired
+    private UserCompletedLevelRepository userCompletedLevelRepo;
 
     // Create
     @Transactional
@@ -230,6 +240,37 @@ public class LevelService {
         levelRepo.saveAndFlush(level);
 
         levelRepo.delete(level);
+    }
+
+    // Mark a level as completed for a user by id
+    @Transactional
+    public UserCompletedLevel completeLevel(int userId, int levelId) {
+        UserEntity user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        LevelEntity level = levelRepo.findById(levelId)
+            .orElseThrow(() -> new EntityNotFoundException("Level not found with ID: " + levelId));
+        
+        if (userCompletedLevelRepo.existsByUserUserIdAndLevelLevelId(userId, levelId)) {
+            throw new IllegalArgumentException("Level " + levelId + " is already completed by user " + userId + ".");
+        }
+        
+        UserCompletedLevel completedLevel = new UserCompletedLevel();
+        completedLevel.setUser(user);
+        completedLevel.setLevel(level);
+        
+        return userCompletedLevelRepo.save(completedLevel);
+    }
+
+    // Get all completed levels for a user by id
+    @Transactional(readOnly = true)
+    public List<LevelEntity> getCompletedLevelsForUser(int userId) {
+        @SuppressWarnings("unused")
+        UserEntity user = userRepo.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+            
+        return userCompletedLevelRepo.findByUserUserId(userId).stream()
+                .map(UserCompletedLevel::getLevel)
+                .collect(Collectors.toList());
     }
 
 }

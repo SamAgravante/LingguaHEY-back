@@ -1,10 +1,10 @@
 package edu.cit.lingguahey.Controller;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,13 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.cit.lingguahey.Entity.LevelEntity;
 import edu.cit.lingguahey.Entity.MonsterType;
+import edu.cit.lingguahey.Entity.UserCompletedLevel;
 import edu.cit.lingguahey.Service.LevelService;
+import edu.cit.lingguahey.model.CompletedLevelResponse;
 import edu.cit.lingguahey.model.ErrorResponse;
 import edu.cit.lingguahey.model.LevelCreateRequest;
 import edu.cit.lingguahey.model.LevelEditRequest;
 import edu.cit.lingguahey.model.LevelMonsterResponse;
 import edu.cit.lingguahey.model.LevelResponse;
 import edu.cit.lingguahey.model.MonsterResponse;
+import edu.cit.lingguahey.model.UserCompletedLevelResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -52,6 +55,9 @@ public class LevelController {
             @ApiResponse(responseCode = "400", description = "Invalid input or level creation failed.", 
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
+            @ApiResponse(responseCode = "409", description = "A level with the same name already exists.",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
@@ -64,6 +70,8 @@ public class LevelController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException | EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Failed to create level", e.getMessage()));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("Failed to create level", "A level with the same name already exists."));
         }
     }
 
@@ -171,6 +179,72 @@ public class LevelController {
         }
     }
 
+    // Mark a level as completed for a user by id
+    @PostMapping("/{levelId}/complete/{userId}")
+    @Operation(
+        summary = "Marks a level as completed for a user",
+        description = "Records a level completion for a specific user. This action is idempotent and will not create a duplicate record if the user has already completed the level.",
+        responses = {
+            @ApiResponse(responseCode = "201", description = "Level successfully completed.",
+                content = @Content(schema = @Schema(implementation = UserCompletedLevel.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "Level already completed by this user or invalid input.",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "User or level not found.",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<?> completeLevel(@PathVariable int levelId, @PathVariable int userId) {
+        try {
+            UserCompletedLevel completedLevel = levelServ.completeLevel(userId, levelId);
+            UserCompletedLevelResponse response = new UserCompletedLevelResponse();
+            response.setUserId(completedLevel.getUser().getUserId());
+            response.setLevelId(completedLevel.getLevel().getLevelId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException | EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Failed to complete level", e.getMessage()));
+        }
+    }
+
+    // Get all completed levels for a user by id
+    @GetMapping("/completed/users/{userId}")
+    @Operation(
+        summary = "Get all completed levels for a user",
+        description = "Retrieves a list of all levels completed by a specific user.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved list of completed levels.",
+                content = @Content(schema = @Schema(implementation = LevelResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "User not found.",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    public ResponseEntity<?> getCompletedLevelsForUser(@PathVariable int userId) {
+        try {
+            List<LevelEntity> completedLevels = levelServ.getCompletedLevelsForUser(userId);
+            List<CompletedLevelResponse> responses = completedLevels.stream()
+                .map(level -> {
+                    CompletedLevelResponse completedResponse = new CompletedLevelResponse();
+                    completedResponse.setLevelId(level.getLevelId());
+                    completedResponse.setLevelName(level.getLevelName());
+                    return completedResponse;
+                })
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(responses);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Failed to retrieve completed levels", e.getMessage()));
+        }
+    }
+
     // Helper method to convert an entity to a DTO
     private LevelResponse convertToDto(LevelEntity level) {
         LevelResponse dto = new LevelResponse();
@@ -186,20 +260,15 @@ public class LevelController {
                 monsterDto.setMonsterType(levelMonster.getMonsterType().name());
                 
                 // Omitted boss details
-                if (levelMonster.getMonsterType() == MonsterType.BOSS) {
-                    monsterDto.setMonster(null);
-                } else {
+                if (levelMonster.getMonster() != null) {
                     MonsterResponse monsterDetails = new MonsterResponse();
                     monsterDetails.setMonsterId(levelMonster.getMonster().getMonsterId());
                     monsterDetails.setTagalogName(levelMonster.getMonster().getTagalogName());
                     monsterDetails.setDescription(levelMonster.getMonster().getDescription());
-                    
-                    /*if (levelMonster.getMonster().getImageData() != null) {
-                        String base64Image = Base64.getEncoder().encodeToString(levelMonster.getMonster().getImageData());
-                        monsterDetails.setImageData(base64Image);
-                    }*/
                     monsterDetails.setImageData(levelMonster.getMonster().getImageData());
                     monsterDto.setMonster(monsterDetails);
+                } else {
+                    monsterDto.setMonster(null);
                 }
                 
                 // Boss' minion forms
@@ -207,14 +276,14 @@ public class LevelController {
                     List<MonsterResponse> bossForms = levelMonster.getMinionForms().stream()
                         .map(bossForm -> {
                             MonsterResponse formDetails = new MonsterResponse();
-                            formDetails.setMonsterId(bossForm.getMinionMonster().getMonster().getMonsterId());
-                            formDetails.setTagalogName(bossForm.getMinionMonster().getMonster().getTagalogName());
-                            formDetails.setDescription(bossForm.getMinionMonster().getMonster().getDescription());
-                            /*if (bossForm.getMinionMonster().getMonster().getImageData() != null) {
-                                String base64Image = Base64.getEncoder().encodeToString(bossForm.getMinionMonster().getMonster().getImageData());
-                                formDetails.setImageData(base64Image);
-                            }*/
-                            formDetails.setImageData(levelMonster.getMonster().getImageData());
+                            if (bossForm.getMinionMonster() != null) {
+                                if (bossForm.getMinionMonster().getMonster() != null) {
+                                    formDetails.setMonsterId(bossForm.getMinionMonster().getMonster().getMonsterId());
+                                    formDetails.setTagalogName(bossForm.getMinionMonster().getMonster().getTagalogName());
+                                    formDetails.setDescription(bossForm.getMinionMonster().getMonster().getDescription());
+                                    formDetails.setImageData(bossForm.getMinionMonster().getMonster().getImageData());
+                                }
+                            }
                             return formDetails;
                         })
                         .collect(Collectors.toList());
