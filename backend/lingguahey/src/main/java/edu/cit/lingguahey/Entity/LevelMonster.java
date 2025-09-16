@@ -2,6 +2,9 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -36,11 +39,13 @@ public class LevelMonster {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "level_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private LevelEntity level;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "monster_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private MonsterEntity monster;
 
     @Enumerated(EnumType.STRING)
