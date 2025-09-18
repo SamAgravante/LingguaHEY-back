@@ -35,6 +35,13 @@ public class PotionShopService {
         userRepo.save(user);
     }
 
+    // Get All Potions for a user
+    public Map<String, Integer> getPotions(int userId) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+        return user.getPotions();
+    }
+
     // Use Potion
     @Transactional
     public void usePotion(int userId, PotionType potionType) {

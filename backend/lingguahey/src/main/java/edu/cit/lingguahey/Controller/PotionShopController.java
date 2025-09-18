@@ -1,9 +1,13 @@
 package edu.cit.lingguahey.Controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,35 +62,29 @@ public class PotionShopController {
         }
     }
 
-    // Use Potion
-    /*@PostMapping("/use-potion")
+    // Get All Potions for a user
+    @GetMapping("/potions/{userId}")
     @Operation(
-        summary = "Use a potion", 
-        description = "Consumes a potion from a user's inventory to apply an in-game effect.",
+        summary = "Get a user's potion stock",
+        description = "Retrieves a map of all potions and their quantities for a specified user.",
         responses = {
-            @ApiResponse(responseCode = "200", description = "Potion used successfully."),
-            @ApiResponse(responseCode = "400", description = "Invalid potion or user has no potions.",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved potion stock."),
             @ApiResponse(responseCode = "404", description = "User not found.",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "Potion cannot be used at this time.",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error.",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )
         }
     )
-    @PreAuthorize("#request.userId == principal.userId")
-    public ResponseEntity<?> usePotion(@RequestBody PotionUseRequest request) {
+    @PreAuthorize("#userId == principal.userId")
+    public ResponseEntity<?> getPotions(@PathVariable int userId) {
         try {
-            potionShopServ.usePotion(request.getUserId(), request.getPotionType());
-            return ResponseEntity.ok("Potion used successfully.");
+            Map<String, Integer> potions = potionShopServ.getPotions(userId);
+            return ResponseEntity.ok(potions);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Entity not found", e.getMessage()));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Action failed", e.getMessage()));
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("Conflict", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Failed to retrieve potions", e.getMessage()));
         }
-    }*/
+    }
+    
 }
