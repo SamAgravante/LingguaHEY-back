@@ -14,6 +14,7 @@ import edu.cit.lingguahey.Entity.LevelEntity;
 import edu.cit.lingguahey.Entity.LevelMonster;
 import edu.cit.lingguahey.Entity.MonsterEntity;
 import edu.cit.lingguahey.Entity.MonsterType;
+import edu.cit.lingguahey.Entity.PotionType;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.LevelRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
@@ -21,6 +22,7 @@ import edu.cit.lingguahey.model.GameSession;
 import edu.cit.lingguahey.model.GameSessionResponse;
 import edu.cit.lingguahey.model.GuessResponse;
 import edu.cit.lingguahey.model.MonsterResponse;
+import edu.cit.lingguahey.model.PotionUseResponse;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -35,7 +37,11 @@ public class GameService {
     @Autowired
     private UserService userServ;
 
+    @Autowired
+    private PotionShopService potionShopServ;
+
     private GameSession currentGameSession;
+    private boolean canUsePotion = true;
 
     // Start new Game
     @Transactional
@@ -45,8 +51,10 @@ public class GameService {
         
         UserEntity user = userRepo.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
-        // Reset lives for new game
+        // Reset stats for new game
         user.setLives(4);
+        user.setShield(0);
+        user.setSkipsLeft(1);
         userRepo.save(user);
 
         if (user.getLives() <= 0) {
@@ -69,6 +77,7 @@ public class GameService {
         this.currentGameSession.setGameOver(false);
         this.currentGameSession.setBossEncounter(false);
         this.currentGameSession.setBossFormsMinionIds(null);
+        this.canUsePotion = true;
     }
 
     public GameSessionResponse getCurrentGameSessionResponse() {
@@ -85,7 +94,7 @@ public class GameService {
                 .map(levelMonster -> {
                     if (levelMonster.getMonsterType() == MonsterType.BOSS) {
                         return new MonsterResponse(
-                            -1, // Use a placeholder ID for the boss
+                            -1, // Placeholder ID for the boss
                             "BOSS",
                             "Defeat the minions to win!",
                             "This is a boss monster. Prepare for a wave of minions.",
@@ -168,6 +177,12 @@ public class GameService {
             throw new IllegalStateException("Game over or not started.");
         }
 
+        UserEntity user = userRepo.findById(currentGameSession.getUserId())
+            .orElseThrow(() -> new EntityNotFoundException("User not found for active session."));
+        currentGameSession.setLives(user.getLives());
+        currentGameSession.setShield(user.getShield());
+        currentGameSession.setSkipsLeft(user.getSkipsLeft());
+
         LevelMonster currentLevelMonster;
         if (currentGameSession.isBossEncounter()) {
             int currentMinionId = currentGameSession.getBossFormsMinionIds()
@@ -220,13 +235,58 @@ public class GameService {
             endGame(true);
             feedback = "Level cleared! You have defeated all monsters.";
         }
-
+        
+        this.canUsePotion = true;
+        
         return new GuessResponse(
             isCorrect,
             feedback,
             currentGameSession.getLives(),
             currentGameSession.isGameOver(),
             isCorrect ? correctAnswer : null
+        );
+    }
+
+    // Use Potion with turn-based logic
+    public PotionUseResponse usePotion(int userId, PotionType potionType) {
+        if (!canUsePotion) {
+            throw new IllegalStateException("A potion can only be used once per guess.");
+        }
+
+        if (potionType == PotionType.SKIP) {
+            if (currentGameSession.getSkipsLeft() <= 0) {
+                throw new IllegalStateException("You do not have a skip available for this level.");
+            }
+        
+            performSkip();
+            userServ.consumeSkip(userId);
+            currentGameSession.setSkipsLeft(0);
+            
+        } else {
+            potionShopServ.usePotion(userId, potionType);
+
+            UserEntity updatedUser = userRepo.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            currentGameSession.setLives(updatedUser.getLives());
+            currentGameSession.setShield(updatedUser.getShield());
+        }
+
+        this.canUsePotion = false;
+
+        UserEntity updatedUser = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        if (currentGameSession.getLives() <= 0) {
+            endGame(false);
+        } else if (currentGameSession.getCurrentMonsterIndex() >= currentGameSession.getMonsters().size() && !currentGameSession.isBossEncounter()) {
+            endGame(true);
+        }
+
+        return new PotionUseResponse(
+            "Potion used successfully!",
+            updatedUser.getLives(),
+            updatedUser.getShield(),
+            updatedUser.getSkipsLeft()
         );
     }
 
@@ -272,6 +332,27 @@ public class GameService {
                         .collect(Collectors.toList())
         );
         currentGameSession.setCurrentBossFormIndex(0);
+    }
+
+    // Helper method to perform the skip action
+    private void performSkip() {
+        String feedback;
+        if (currentGameSession.isBossEncounter()) {
+            currentGameSession.setCurrentBossFormIndex(currentGameSession.getCurrentBossFormIndex() + 1);
+            if (currentGameSession.getCurrentBossFormIndex() >= currentGameSession.getBossFormsMinionIds().size()) {
+                currentGameSession.setBossEncounter(false);
+                currentGameSession.setClearedMonstersCount(currentGameSession.getClearedMonstersCount() + 1);
+                currentGameSession.setCurrentMonsterIndex(currentGameSession.getCurrentMonsterIndex() + 1);
+                feedback = "Boss defeated with a skip! Level up!";
+            } else {
+                feedback = "Minion skipped! Moving on to the next boss form.";
+            }
+        } else {
+            currentGameSession.setClearedMonstersCount(currentGameSession.getClearedMonstersCount() + 1);
+            currentGameSession.setCurrentMonsterIndex(currentGameSession.getCurrentMonsterIndex() + 1);
+            feedback = "Monster skipped successfully!";
+        }
+        System.out.println(feedback); // Debug logs
     }
 
     // Load in lazy-loaded monster data

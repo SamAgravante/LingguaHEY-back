@@ -8,7 +8,7 @@ import lombok.Data;
 public class GuessResponse {
     private boolean isCorrect;
     private String feedback;
-    private int heartsLeft;
+    private int lives;
     private boolean isGameOver;
     private String correctAnswer;
 }

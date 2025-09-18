@@ -10,17 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.cit.lingguahey.Entity.UserEntity;
-import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.Service.GameService;
-import edu.cit.lingguahey.Service.PotionShopService;
 import edu.cit.lingguahey.model.ErrorResponse;
 import edu.cit.lingguahey.model.GameSession;
-import edu.cit.lingguahey.model.GameSessionResponse;
 import edu.cit.lingguahey.model.GuessRequest;
 import edu.cit.lingguahey.model.GuessResponse;
 import edu.cit.lingguahey.model.MonsterResponse;
 import edu.cit.lingguahey.model.PotionUseRequest;
+import edu.cit.lingguahey.model.PotionUseResponse;
 import edu.cit.lingguahey.model.StartGameRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,12 +33,6 @@ public class GameController {
 
     @Autowired
     private GameService gameServ;
-
-    @Autowired
-    private PotionShopService potionShopServ;
-
-    @Autowired
-    private UserRepository userRepo;
 
     // Start new Game
     @PostMapping("/start")
@@ -118,7 +109,7 @@ public class GameController {
         }
     }
 
-    // Use Potion
+    // Use Potion with turn-based logic
     @PostMapping("/use-potion")
     @Operation(
         summary = "Use a potion", 
@@ -140,17 +131,8 @@ public class GameController {
     @PreAuthorize("#request.userId == principal.userId")
     public ResponseEntity<?> usePotion(@RequestBody PotionUseRequest request) {
         try {
-            potionShopServ.usePotion(request.getUserId(), request.getPotionType());
-            
-            GameSessionResponse session = gameServ.getCurrentGameSessionResponse();
-            UserEntity updatedUser = userRepo.findById(request.getUserId())
-                                             .orElseThrow(() -> new EntityNotFoundException("User not found"));
-            
-            session.setLives(updatedUser.getLives());
-            session.setShield(updatedUser.getShield());
-            session.setSkipsLeft(updatedUser.getSkipsLeft());
-            
-            return ResponseEntity.ok(session);
+            PotionUseResponse response = gameServ.usePotion(request.getUserId(), request.getPotionType());
+            return ResponseEntity.ok(response);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Entity not found", e.getMessage()));
         } catch (IllegalArgumentException e) {

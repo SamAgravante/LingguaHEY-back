@@ -182,4 +182,15 @@ public class UserService {
         user.setGems(user.getGems() + gems);
         userRepo.save(user);
     }
+
+    // Skip Counter
+    @Transactional
+    public void consumeSkip(int userId) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (user.getSkipsLeft() > 0) {
+            user.setSkipsLeft(user.getSkipsLeft() - 1);
+            userRepo.save(user);
+        }
+    }
 }

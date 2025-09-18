@@ -62,9 +62,6 @@ public class PotionShopService {
                 user.setShield(user.getShield() + 1);
                 break;
             case SKIP:
-                if (user.getSkipsLeft() > 0) {
-                    throw new IllegalStateException("A skip potion can only be used once per level.");
-                }
                 user.setSkipsLeft(user.getSkipsLeft() + 1);
                 break;
             default:
