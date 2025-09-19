@@ -12,4 +12,5 @@ public class PotionUseResponse {
     private int updatedLives;
     private int updatedShield;
     private int updatedSkipsLeft;
+    private boolean isLevelCleared;
 }

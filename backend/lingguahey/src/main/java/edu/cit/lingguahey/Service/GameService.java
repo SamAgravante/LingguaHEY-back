@@ -253,6 +253,8 @@ public class GameService {
             throw new IllegalStateException("A potion can only be used once per guess.");
         }
 
+        String feedback = "Potion used successfully!"; // default message
+
         if (potionType == PotionType.SKIP) {
             if (currentGameSession.getSkipsLeft() <= 0) {
                 throw new IllegalStateException("You do not have a skip available for this level.");
@@ -261,32 +263,36 @@ public class GameService {
             performSkip();
             userServ.consumeSkip(userId);
             currentGameSession.setSkipsLeft(0);
+            feedback = "Monster skipped successfully!";
             
         } else {
             potionShopServ.usePotion(userId, potionType);
-
-            UserEntity updatedUser = userRepo.findById(userId)
-                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
-            currentGameSession.setLives(updatedUser.getLives());
-            currentGameSession.setShield(updatedUser.getShield());
         }
+        
+        // update current game session
+        UserEntity updatedUser = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        currentGameSession.setLives(updatedUser.getLives());
+        currentGameSession.setShield(updatedUser.getShield());
 
         this.canUsePotion = false;
 
-        UserEntity updatedUser = userRepo.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
-
+        boolean isLevelCleared = false;
         if (currentGameSession.getLives() <= 0) {
             endGame(false);
+            feedback = "Game over. You have no hearts left. Returning to level selection.";
         } else if (currentGameSession.getCurrentMonsterIndex() >= currentGameSession.getMonsters().size() && !currentGameSession.isBossEncounter()) {
             endGame(true);
+            isLevelCleared = true;
+            feedback = "Level cleared with a skip!";
         }
 
         return new PotionUseResponse(
-            "Potion used successfully!",
+            feedback,
             updatedUser.getLives(),
             updatedUser.getShield(),
-            updatedUser.getSkipsLeft()
+            updatedUser.getSkipsLeft(),
+            isLevelCleared
         );
     }
 
