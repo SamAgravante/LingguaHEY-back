@@ -143,7 +143,7 @@ public class ClassroomController {
     }
 
     // Delete a ClassroomEntity by id
-    /*@DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     @Operation(
         description = "Delete a classroom by ID",
         responses = {
@@ -160,10 +160,10 @@ public class ClassroomController {
     
     public String deleteClassroomEntity(@PathVariable int id) {
         return classroomService.deleteClassroomEntity(id);
-    }*/
+    }
 
     // Add Student to Classroom
-    /*@PostMapping("/{classroomId}/students/{studentId}")
+    @PostMapping("/{classroomId}/students/{studentId}")
     @Operation(
         description = "Add a student to a classroom",
         responses = {
@@ -181,7 +181,7 @@ public class ClassroomController {
     )
     public String addStudentToClassroom(@PathVariable int classroomId, @PathVariable int studentId) throws AccessDeniedException {
         return classroomService.addStudentToClassroom(classroomId, studentId);
-    }*/
+    }
 
     // Remove User from Classroom
     @DeleteMapping("/{classroomId}/students/{studentId}")

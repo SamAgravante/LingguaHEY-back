@@ -1,21 +1,17 @@
 package edu.cit.lingguahey.Service;
 
-import edu.cit.lingguahey.Entity.ChoiceEntity;
 import edu.cit.lingguahey.Entity.ClassroomActivityLive;
 import edu.cit.lingguahey.Entity.ClassroomEntity;
 import edu.cit.lingguahey.Entity.ClassroomUser;
 
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
-import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.Role;
 import edu.cit.lingguahey.Entity.UserActivityLive;
 import edu.cit.lingguahey.Entity.UserEntity;
-import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.ClassroomActivityLiveRepository;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
-import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -54,12 +50,6 @@ public class ClassroomService {
 
     @Autowired
     private ClassroomActivityLiveRepository classroomActivityLiveRepo;
-
-    @Autowired
-    private QuestionRepository questionRepo;
-
-    @Autowired
-    private ChoiceRepository choiceRepo;
 
     private UserEntity getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -109,56 +99,13 @@ public class ClassroomService {
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("Classroom " + classroomId + " not found!");
         }
-    }
-
-    // DELETE CLASSROOM BY ID IS COMMENTED OUT SINCE
-    // IT CONTAINS CODES INVOLVING LESSON ACTIVITY WHICH IS DEPRECATED
-    // DOUBLE CHECK THIS PART
-
-    //                  ⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆ 
-    //                ⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿ 
-    //                ⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀ 
-    //                ⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //               ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
-
-    
+    }    
 
     // Delete a ClassroomEntity by id
-    /*
     public String deleteClassroomEntity(int classroomId) {
         if (classroomRepo.existsById(classroomId)) {
             List<ClassroomUser> classroomUsers = classroomUserRepo.findByClassroom_ClassroomID(classroomId);
             classroomUserRepo.deleteAll(classroomUsers);
-
-            List<LessonActivityEntity> activities = activityRepo.findByLessonClassroom_ClassroomID(classroomId);
-            for (LessonActivityEntity activity : activities) {
-                int activityId = activity.getActivityId();
-
-                // Delete user-activity links
-                List<UserActivity> userActivities = userActivityRepo.findByActivity_ActivityId(activityId);
-                userActivityRepo.deleteAll(userActivities);
-
-                // Delete questions and choices related to the activity
-                List<QuestionEntity> questions = questionRepo.findByActivity_ActivityId(activityId);
-                for (QuestionEntity question : questions) {
-                    List<ChoiceEntity> choices = choiceRepo.findByQuestion_QuestionId(question.getQuestionId());
-                    choiceRepo.deleteAll(choices);
-                    questionRepo.delete(question);
-                }
-
-                // Delete the activity
-                activityRepo.delete(activity);
-            }
 
             List<LiveActivityEntity> liveActivities = liveActivityRepo.findByActivityClassroom_ClassroomID(classroomId);
             for (LiveActivityEntity activity : liveActivities) {
@@ -170,14 +117,6 @@ public class ClassroomService {
                 List<ClassroomActivityLive> classroomActivities = classroomActivityLiveRepo.findByActivity_ActivityId(activityId);
                 classroomActivityLiveRepo.deleteAll(classroomActivities);
 
-                // Delete questions and choices related to the activity
-                List<QuestionEntity> questions = questionRepo.findByActivity_ActivityId(activityId);
-                for (QuestionEntity question : questions) {
-                    List<ChoiceEntity> choices = choiceRepo.findByQuestion_QuestionId(question.getQuestionId());
-                    choiceRepo.deleteAll(choices);
-                    questionRepo.delete(question);
-                }
-
                 // Delete the activity
                 liveActivityRepo.delete(activity);
             }
@@ -188,32 +127,10 @@ public class ClassroomService {
             throw new EntityNotFoundException("Classroom " + classroomId + " not found!");
         }
     }
-    */
-
-    // ADD STUDENT TO CLASSROOM IS COMMENTED OUT SINCE
-    // IT CONTAINS CODES INVOLVING LESSON ACTIVITY WHICH IS DEPRECATED
-    // DOUBLE CHECK THIS PART
-
-    //                  ⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆ 
-    //                ⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿ 
-    //                ⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀ 
-    //                ⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀ 
-    //                ⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //               ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
-    //               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
-
     
 
     // Add Student to Classroom
-    /*
+    
     @Transactional
     public String addStudentToClassroom(int classroomId, int studentId) throws AccessDeniedException {
         UserEntity teacher = getCurrentUser();
@@ -237,14 +154,9 @@ public class ClassroomService {
         classroomUser.setUser(student);
         classroomUserRepo.save(classroomUser);
 
-        activityRepo.findAll().forEach(act -> {
-            UserActivity ua = new UserActivity(classroomUser.getUser(), act);
-            userActivityRepo.save(ua);
-        });
-
         return "Student added successfully to the classroom!";
     }
-    */
+
 
     // Remove User from Classroom
     @Transactional

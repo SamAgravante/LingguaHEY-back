@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.lingguahey.Entity.Role;
 import edu.cit.lingguahey.Entity.UserEntity;
-import edu.cit.lingguahey.Repository.ClassroomUserRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.config.JwtService;
 import edu.cit.lingguahey.token.Token;
@@ -27,21 +26,19 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final ClassroomUserRepository classroomUserRepo;
     private final EmailService emailService;
     @Value("${app.base-url}")
     private String baseUrl;
 
     public AuthenticationService(UserRepository repository, TokenRepository tokenRepository,
             PasswordEncoder passwordEncoder, JwtService jwtService,
-            AuthenticationManager authenticationManager, ClassroomUserRepository classroomUserRepo,
+            AuthenticationManager authenticationManager,
             EmailService emailService) {
         this.repository = repository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.classroomUserRepo = classroomUserRepo;
         this.emailService = emailService;
     }
 
@@ -127,12 +124,7 @@ public class AuthenticationService {
                         request.getPassword()));
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        // asssign activities on login
 
-        // NEED TO DOUBLE CHECK HERE
-        // CODE REMOVED BECAUSE OF LIVE ACTIVITY
-
-        // assignNewActivitiesToUser(user);
         var jwtToken = jwtService.generateToken(user);
         // save token to db for logout
         revokeAllUserTokens(user);
@@ -166,23 +158,4 @@ public class AuthenticationService {
                 .build();
         tokenRepository.save(token);
     }
-
-
-/* 
-    private void assignNewActivitiesToUser(UserEntity user) {
-        var classroomUser = classroomUserRepo.findByUser_UserId(user.getUserId());
-        if (classroomUser.isPresent()) {
-            int classroomId = classroomUser.get().getClassroom().getClassroomID();
-            var activities = activityRepo.findByLessonClassroom_ClassroomID(classroomId);
-            for (LessonActivityEntity activity : activities) {
-                boolean alreadyAssigned = userActivityRepo
-                        .findByUser_UserIdAndActivity_ActivityId(user.getUserId(), activity.getActivityId())
-                        .isPresent();
-                if (!alreadyAssigned) {
-                    UserActivity userActivity = new UserActivity(user, activity);
-                    userActivityRepo.save(userActivity);
-                }
-            }
-        }
-    }*/
 }
