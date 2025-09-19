@@ -4,22 +4,19 @@ import edu.cit.lingguahey.Entity.ChoiceEntity;
 import edu.cit.lingguahey.Entity.ClassroomActivityLive;
 import edu.cit.lingguahey.Entity.ClassroomEntity;
 import edu.cit.lingguahey.Entity.ClassroomUser;
-import edu.cit.lingguahey.Entity.LessonActivityEntity;
+
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.Role;
-import edu.cit.lingguahey.Entity.UserActivity;
 import edu.cit.lingguahey.Entity.UserActivityLive;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
 import edu.cit.lingguahey.Repository.ClassroomActivityLiveRepository;
 import edu.cit.lingguahey.Repository.ClassroomRepository;
 import edu.cit.lingguahey.Repository.ClassroomUserRepository;
-import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import edu.cit.lingguahey.Repository.UserActivityLiveRepository;
-import edu.cit.lingguahey.Repository.UserActivityRepository;
 import edu.cit.lingguahey.Repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -49,13 +46,8 @@ public class ClassroomService {
     private UserRepository userRepo;
 
     @Autowired
-    private LessonActivityRepository activityRepo;
-
-    @Autowired
     private LiveActivityRepository liveActivityRepo;
 
-    @Autowired
-    private UserActivityRepository userActivityRepo;
 
     @Autowired
     private UserActivityLiveRepository userActivityLiveRepo;
@@ -119,7 +111,30 @@ public class ClassroomService {
         }
     }
 
+    // DELETE CLASSROOM BY ID IS COMMENTED OUT SINCE
+    // IT CONTAINS CODES INVOLVING LESSON ACTIVITY WHICH IS DEPRECATED
+    // DOUBLE CHECK THIS PART
+
+    //                  ⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆ 
+    //                ⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿ 
+    //                ⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀ 
+    //                ⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //               ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
+
+    
+
     // Delete a ClassroomEntity by id
+    /*
     public String deleteClassroomEntity(int classroomId) {
         if (classroomRepo.existsById(classroomId)) {
             List<ClassroomUser> classroomUsers = classroomUserRepo.findByClassroom_ClassroomID(classroomId);
@@ -173,8 +188,32 @@ public class ClassroomService {
             throw new EntityNotFoundException("Classroom " + classroomId + " not found!");
         }
     }
+    */
+
+    // ADD STUDENT TO CLASSROOM IS COMMENTED OUT SINCE
+    // IT CONTAINS CODES INVOLVING LESSON ACTIVITY WHICH IS DEPRECATED
+    // DOUBLE CHECK THIS PART
+
+    //                  ⢀⡴⠑⡄⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣤⣤⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠸⡇⠀⠿⡀⠀⠀⠀⣀⡴⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠑⢄⣠⠾⠁⣀⣄⡈⠙⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⢀⡀⠁⠀⠀⠈⠙⠛⠂⠈⣿⣿⣿⣿⣿⠿⡿⢿⣆⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⢀⡾⣁⣀⠀⠴⠂⠙⣗⡀⠀⢻⣿⣿⠭⢤⣴⣦⣤⣹⠀⠀⠀⢀⢴⣶⣆ 
+    //                ⠀⠀⢀⣾⣿⣿⣿⣷⣮⣽⣾⣿⣥⣴⣿⣿⡿⢂⠔⢚⡿⢿⣿⣦⣴⣾⠁⠸⣼⡿ 
+    //                ⠀⢀⡞⠁⠙⠻⠿⠟⠉⠀⠛⢹⣿⣿⣿⣿⣿⣌⢤⣼⣿⣾⣿⡟⠉⠀⠀⠀⠀⠀ 
+    //                ⠀⣾⣷⣶⠇⠀⠀⣤⣄⣀⡀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠉⠈⠉⠀⠀⢦⡈⢻⣿⣿⣿⣶⣶⣶⣶⣤⣽⡹⣿⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⠀⠉⠲⣽⡻⢿⣿⣿⣿⣿⣿⣿⣷⣜⣿⣿⣿⡇⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣷⣶⣮⣭⣽⣿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⣀⣀⣈⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀ 
+    //                ⠀⠀⠀⠀⠀⠀⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //               ⠀⠀⠀⠀⠀⠀⠀⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+    //               ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⠻⠿⠿⠿⠿⠛⠉
+
+    
 
     // Add Student to Classroom
+    /*
     @Transactional
     public String addStudentToClassroom(int classroomId, int studentId) throws AccessDeniedException {
         UserEntity teacher = getCurrentUser();
@@ -205,6 +244,7 @@ public class ClassroomService {
 
         return "Student added successfully to the classroom!";
     }
+    */
 
     // Remove User from Classroom
     @Transactional

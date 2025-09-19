@@ -1,4 +1,4 @@
-package edu.cit.lingguahey.Controller;
+/*package edu.cit.lingguahey.Controller;
 
 import com.google.cloud.texttospeech.v1.AudioEncoding;
 import com.google.cloud.texttospeech.v1.SsmlVoiceGender;
@@ -78,3 +78,5 @@ public class TextToSpeechController {
         }
     }
 }
+*/ 
+//TEMPORARY CODE SINCE WE HAVE NO SERVICE KEY

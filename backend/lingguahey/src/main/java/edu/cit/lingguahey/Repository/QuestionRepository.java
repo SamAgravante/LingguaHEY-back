@@ -9,6 +9,5 @@ import edu.cit.lingguahey.Entity.QuestionEntity;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<QuestionEntity, Integer> {
-    List<QuestionEntity> findByActivity_ActivityId(int activityId);
     List<QuestionEntity> findByLiveActivity_ActivityId(int activityId);
 }

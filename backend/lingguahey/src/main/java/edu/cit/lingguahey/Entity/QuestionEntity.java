@@ -46,11 +46,6 @@ public class QuestionEntity {
     private ScoreEntity score;
 
     @ManyToOne
-    @JoinColumn(name = "activity_id")
-    @JsonBackReference(value = "activity-questions")
-    private LessonActivityEntity activity;
-
-    @ManyToOne
     @JoinColumn(name = "live_activity_id")
     @JsonBackReference(value = "liveactivity-questions")
     private LiveActivityEntity liveActivity;
@@ -112,14 +107,6 @@ public class QuestionEntity {
 
     public void setScore(ScoreEntity score) {
         this.score = score;
-    }
-
-    public LessonActivityEntity getActivity() {
-        return activity;
-    }
-
-    public void setActivity(LessonActivityEntity activity) {
-        this.activity = activity;
     }
 
     public GameType getGameType() {

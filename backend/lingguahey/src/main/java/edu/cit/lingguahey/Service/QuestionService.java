@@ -11,7 +11,6 @@ import edu.cit.lingguahey.Entity.ChoiceEntity;
 //import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Repository.ChoiceRepository;
-import edu.cit.lingguahey.Repository.LessonActivityRepository;
 import edu.cit.lingguahey.Repository.LiveActivityRepository;
 import edu.cit.lingguahey.Repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,38 +22,13 @@ public class QuestionService {
     private QuestionRepository questionRepo;
 
     @Autowired
-    private LessonActivityRepository activityRepo;
-
-    @Autowired
     private LiveActivityRepository liveactivityRepo;
     
 
     @Autowired
     private ChoiceRepository choiceRepo;
 
-    // Create
-    /*public QuestionEntity postQuestionEntity(QuestionEntity question) {
-        return questionRepo.save(question);
-    }*/
-
-    // Create and Add Question to Activity
-    public QuestionEntity postQuestionForActivity(int activityId, String questionDescription, String questionText, MultipartFile image) {
-        var activity = activityRepo.findById(activityId)
-            .orElseThrow(() -> new EntityNotFoundException("Activity not found with ID: " + activityId));
-        QuestionEntity question = new QuestionEntity();
-        question.setActivity(activity);
-        question.setQuestionDescription(questionDescription);
-        question.setQuestionText(questionText);
-        if (image != null && !image.isEmpty()) {
-            try {
-                question.setQuestionImage(image.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload image", e);
-            }
-        }
-        return questionRepo.save(question);
-    }
-
+    // REMOVED ALL CODES INVOLVING ACTIVITYREPO WHICH IS LESSON ACTIVITY
 
     // Read All Questions
     public List<QuestionEntity> getAllQuestionEntity() {
@@ -64,13 +38,6 @@ public class QuestionService {
     // Read Single Question
     public QuestionEntity getQuestionEntity(int questionId) {
         return questionRepo.findById(questionId).get();
-    }
-
-    // Read all questions for activity
-    public List<QuestionEntity> getQuestionsForActivity(int activityId) {
-        var activity = activityRepo.findById(activityId)
-            .orElseThrow(() -> new EntityNotFoundException("Activity not found with ID: " + activityId));
-        return activity.getQuestions();
     }
 
     // Update

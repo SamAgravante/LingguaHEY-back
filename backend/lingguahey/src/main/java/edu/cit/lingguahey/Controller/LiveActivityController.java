@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.cit.lingguahey.Entity.LessonActivityEntity;
 import edu.cit.lingguahey.Entity.LiveActivityEntity;
 import edu.cit.lingguahey.Service.LiveActivityService;
 import edu.cit.lingguahey.model.ClassroomActivityLiveProjection;
@@ -161,6 +160,10 @@ public class LiveActivityController {
     }
 
     // Update
+
+    // METHOD COMMENTED OUT KAY WALA KO KAHIBALO NGANO NAAY LESSON ACTIVITY ENTITY DIRA
+
+    /*
     @PutMapping("/{id}")
     @Operation(
         summary = "Update a live activity",
@@ -185,7 +188,7 @@ public class LiveActivityController {
     public ResponseEntity<LiveActivityEntity> putActivityEntity(@PathVariable int id, @RequestBody LiveActivityEntity newActivity) {
         LiveActivityEntity putActivity = activityServ.putActivityEntity(id, newActivity);
         return ResponseEntity.ok().body(putActivity);
-    }
+    }*/
 
     // Delete an ActivityEntity by id
     @DeleteMapping("/{id}")

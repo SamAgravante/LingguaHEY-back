@@ -193,6 +193,8 @@ public class ScoreController {
     }
 
     // Total Score for User
+    // COMMENTED OUT KAY NAAY LESSON ACTIVITY NGA METHOD
+    /*
     @GetMapping("/users/{userId}/total")
     @Operation(
         summary = "Get total score for a user",
@@ -211,7 +213,7 @@ public class ScoreController {
     public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
         int totalScore = scoreService.getTotalScoreForUser(userId);
         return ResponseEntity.ok().body(totalScore);
-    }
+    }*/
      
     // Total Live Score for User
     @GetMapping("/users/{userId}/total-live")

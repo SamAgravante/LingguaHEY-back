@@ -26,6 +26,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
+// IF GA WONDER KA KUNG NAAY GUBA DIRI
+// AKO GI COMMENT OUT ANG DELETE CLASSROOM
+// UG ADD STUDENT TO CLASSROOM
+// KAY NEED PANA E DOUBLE CHECK TUNGOD SA
+// LESSON ACTIVITY
+
 @RestController
 @RequestMapping("api/lingguahey/classrooms")
 @Tag(name = "Classroom")
@@ -137,7 +143,7 @@ public class ClassroomController {
     }
 
     // Delete a ClassroomEntity by id
-    @DeleteMapping("/{id}")
+    /*@DeleteMapping("/{id}")
     @Operation(
         description = "Delete a classroom by ID",
         responses = {
@@ -150,12 +156,14 @@ public class ClassroomController {
             )
         }
     )
+
+    
     public String deleteClassroomEntity(@PathVariable int id) {
         return classroomService.deleteClassroomEntity(id);
-    }
+    }*/
 
     // Add Student to Classroom
-    @PostMapping("/{classroomId}/students/{studentId}")
+    /*@PostMapping("/{classroomId}/students/{studentId}")
     @Operation(
         description = "Add a student to a classroom",
         responses = {
@@ -173,7 +181,7 @@ public class ClassroomController {
     )
     public String addStudentToClassroom(@PathVariable int classroomId, @PathVariable int studentId) throws AccessDeniedException {
         return classroomService.addStudentToClassroom(classroomId, studentId);
-    }
+    }*/
 
     // Remove User from Classroom
     @DeleteMapping("/{classroomId}/students/{studentId}")

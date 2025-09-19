@@ -33,6 +33,7 @@ public class QuestionController {
     private QuestionService questionServ;
 
     // Create question for activity
+    /*
     @PostMapping(value = "/activities/{activityId}", consumes = "multipart/form-data")
     @Operation(
         summary = "Create a question for a specific activity with an image",
@@ -40,7 +41,7 @@ public class QuestionController {
         /*requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Question data to create (without ID)",
             content = @Content(schema = @Schema(implementation = QuestionEntity.class))
-        ),*/
+        ),/
         responses = {
             @ApiResponse(responseCode = "201", description = "Question created and added to activity successfully"),
             @ApiResponse(responseCode = "404", description = "Activity not found",
@@ -54,7 +55,7 @@ public class QuestionController {
     public ResponseEntity<QuestionEntity> postQuestionForActivity(@PathVariable int activityId, @RequestParam String questionDescription, @RequestParam String questionText, @RequestParam(value = "image", required = false) MultipartFile image) {
         QuestionEntity postQuestion = questionServ.postQuestionForActivity(activityId, questionDescription, questionText, image);
         return ResponseEntity.status(201).body(postQuestion);
-    }
+    }*/
 
     // Read All Questions
     @GetMapping("")
@@ -94,6 +95,8 @@ public class QuestionController {
     }
 
     // Read all questions for activity
+    // COMMENTED OUT BECAUSE OF LESSON ACTIVITY
+    /*
     @GetMapping("/activities/{activityId}")
     @Operation(
         summary = "Get all questions for an activity",
@@ -111,7 +114,7 @@ public class QuestionController {
     public ResponseEntity<List<QuestionEntity>> getQuestionsForActivity(@PathVariable int activityId) {
         List<QuestionEntity> questions = questionServ.getQuestionsForActivity(activityId);
         return ResponseEntity.ok().body(questions);
-    }
+    }*/
 
     // Update
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
