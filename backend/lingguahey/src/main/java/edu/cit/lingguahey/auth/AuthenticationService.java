@@ -66,7 +66,6 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .idNumber(request.getIdNumber())
-                .totalPoints(request.getTotalPoints())
                 .subscriptionStatus(request.isSubscriptionStatus())
                 .role(request.getRole())
                 .enabled(isEnabled)

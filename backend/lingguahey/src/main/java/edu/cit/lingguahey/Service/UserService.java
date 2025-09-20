@@ -67,7 +67,6 @@ public class UserService {
                 }
             }
             user.setIdNumber(newUser.getIdNumber());
-            user.setTotalPoints(newUser.getTotalPoints());
             user.setSubscriptionStatus(newUser.getSubscriptionStatus());
             user.setProfilePic(newUser.getProfilePic());
             return userRepo.save(user);

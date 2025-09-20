@@ -53,7 +53,6 @@ public class UserEntity implements UserDetails {
     private String email;
     private String password;
     private String idNumber;
-    private int totalPoints;
 
     @Builder.Default
     private int gems = 0;
@@ -240,14 +239,6 @@ public class UserEntity implements UserDetails {
 
     public void setIdNumber(String idNumber) {
         this.idNumber = idNumber;
-    }
-
-    public int getTotalPoints() {
-        return totalPoints;
-    }
-
-    public void setTotalPoints(int totalPoints) {
-        this.totalPoints = totalPoints;
     }
     
     public int getGems() {
