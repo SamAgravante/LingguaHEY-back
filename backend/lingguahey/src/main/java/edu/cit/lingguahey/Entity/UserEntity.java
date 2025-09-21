@@ -112,7 +112,7 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "user-tokens")
     private List<Token> tokens;
 
@@ -172,7 +172,7 @@ public class UserEntity implements UserDetails {
     @JsonManagedReference(value = "user-scores")
     private List<ScoreEntity> scores;
 
-    @OneToMany(mappedBy = "teacher")
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "classroom-teacher")
     private List<ClassroomEntity> classrooms;
 

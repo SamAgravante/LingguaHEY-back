@@ -80,9 +80,9 @@ public class UserService {
     public String deleteUserEntity(int userId){
         if (userRepo.findById(userId) != null){
             userRepo.deleteById(userId);
-            return "User " +userId+ "Deleted Successfully!";
+            return "User " +userId+ " Deleted Successfully!";
         } else {
-            return "User " +userId+ "not found!";
+            return "User " +userId+ " not found!";
         }
     }
 
