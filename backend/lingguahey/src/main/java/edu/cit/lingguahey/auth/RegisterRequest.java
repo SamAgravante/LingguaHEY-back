@@ -33,8 +33,6 @@ public class RegisterRequest {
     @NotBlank(message = "ID number is required")
     private String idNumber;
     @Builder.Default
-    private int totalPoints = 0;
-    @Builder.Default
     private boolean subscriptionStatus = false;
     @Builder.Default
     private Role role = Role.USER; 
