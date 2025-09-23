@@ -191,29 +191,6 @@ public class ScoreController {
         scoreService.awardScoreToUserForTranslationGame(questionId, userId, userSelectedChoiceIds);
         return ResponseEntity.ok().build();
     }
-
-    // Total Score for User
-    // COMMENTED OUT KAY NAAY LESSON ACTIVITY NGA METHOD
-    /*
-    @GetMapping("/users/{userId}/total")
-    @Operation(
-        summary = "Get total score for a user",
-        description = "Calculates and retrieves the total score for a specific user",
-        responses = {
-            @ApiResponse(responseCode = "200", description = "OK"),
-            @ApiResponse(responseCode = "404", description = "User not found",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            )
-        }
-    )
-    @PreAuthorize("#userId == principal.userId or hasAuthority('admin:read') or hasAuthority('teacher:read')")
-    public ResponseEntity<Integer> getTotalScoreForUser(@PathVariable int userId) {
-        int totalScore = scoreService.getTotalScoreForUser(userId);
-        return ResponseEntity.ok().body(totalScore);
-    }*/
      
     // Total Live Score for User
     @GetMapping("/users/{userId}/total-live")

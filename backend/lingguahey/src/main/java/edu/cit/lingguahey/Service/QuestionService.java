@@ -28,8 +28,6 @@ public class QuestionService {
     @Autowired
     private ChoiceRepository choiceRepo;
 
-    // REMOVED ALL CODES INVOLVING ACTIVITYREPO WHICH IS LESSON ACTIVITY
-
     // Read All Questions
     public List<QuestionEntity> getAllQuestionEntity() {
         return questionRepo.findAll();

@@ -145,30 +145,6 @@ public class ScoreService {
         userScoreRepo.save(userScore);
     }
 
-    // Total Score for User
-
-    // COMMENTED OUT KAY I THINK PARA NI SA LESSON ACTIVITIES
-
-    /*
-     * @SuppressWarnings("unused")
-     * public int getTotalScoreForUser(int userId) {
-     * UserEntity user = userRepo.findById(userId)
-     * .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " +
-     * userId));
-     * 
-     * return userScoreRepo.findByUser_UserId(userId).stream()
-     * .filter(userScore -> {
-     * QuestionEntity question = userScore.getQuestion();
-     * // Only include scores from questions that belong to LessonActivities
-     * return question != null &&
-     * question.getActivity() != null &&
-     * question.getLiveActivity() == null;
-     * })
-     * .mapToInt(UserScore::getScore)
-     * .sum();
-     * }
-     */
-
     // Total Score for User (for Live Activities)
     @SuppressWarnings("unused")
     public int getTotalScoreForLiveUser(int userId) {

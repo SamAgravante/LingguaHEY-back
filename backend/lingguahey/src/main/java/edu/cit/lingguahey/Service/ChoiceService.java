@@ -22,11 +22,6 @@ public class ChoiceService {
     @Autowired
     private QuestionRepository questionRepo;
 
-    // Create
-    /*public ChoiceEntity postChoiceEntity(ChoiceEntity choice) {
-        return choiceRepo.save(choice);
-    }*/
-
     // Create and Add Choice to Question
     public ChoiceEntity postChoiceForQuestion(int questionId, ChoiceEntity choice) {
         var question = questionRepo.findById(questionId)
