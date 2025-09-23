@@ -160,17 +160,13 @@ public class LiveActivityController {
     }
 
     // Update
-
-    // METHOD COMMENTED OUT KAY WALA KO KAHIBALO NGANO NAAY LESSON ACTIVITY ENTITY DIRA
-
-    /*
     @PutMapping("/{id}")
     @Operation(
         summary = "Update a live activity",
         description = "Updates an existing live activity by its ID",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "Updated activity data",
-            content = @Content(schema = @Schema(implementation = LessonActivityEntity.class))
+            content = @Content(schema = @Schema(implementation = LiveActivityEntity.class))
         ),
         responses = {
             @ApiResponse(responseCode = "200", description = "Activity updated successfully"),
@@ -188,7 +184,7 @@ public class LiveActivityController {
     public ResponseEntity<LiveActivityEntity> putActivityEntity(@PathVariable int id, @RequestBody LiveActivityEntity newActivity) {
         LiveActivityEntity putActivity = activityServ.putActivityEntity(id, newActivity);
         return ResponseEntity.ok().body(putActivity);
-    }*/
+    }
 
     // Delete an ActivityEntity by id
     @DeleteMapping("/{id}")
