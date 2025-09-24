@@ -2,6 +2,9 @@ package edu.cit.lingguahey.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,16 +28,9 @@ public class DataInitializerService {
         if (cosmeticRepo.count() == 0) {
             //Cosmetics Map
             Map<String, Object[]> cosmeticsData = new HashMap<>();
-            cosmeticsData.put("Fireball FX", new Object[]{Rarity.COMMON, "images/fireball_fx.png"});
-            cosmeticsData.put("Waterbolt FX", new Object[]{Rarity.COMMON, "images/waterbolt_fx.png"});
-            cosmeticsData.put("Air Slash FX", new Object[]{Rarity.COMMON, "images/air_slash_fx.png"});
-            cosmeticsData.put("Earthquake FX", new Object[]{Rarity.COMMON, "images/earthquake_fx.png"});
-            cosmeticsData.put("Lightning Armor", new Object[]{Rarity.RARE, "images/lightning_armor.png"});
-            cosmeticsData.put("Shadow Cloak", new Object[]{Rarity.RARE, "images/shadow_cloak.png"});
-            cosmeticsData.put("Mystic Bow", new Object[]{Rarity.RARE, "images/mystic_bow.png"});
-            cosmeticsData.put("Legendary Sword", new Object[]{Rarity.LEGENDARY, "images/legendary_sword.png"});
-            cosmeticsData.put("Mythic Dragon Mount", new Object[]{Rarity.LEGENDARY, "images/mythic_dragon_mount.png"});
-            cosmeticsData.put("Cosmic Phoenix", new Object[]{Rarity.MYTHIC, "images/cosmic_phoenix.png"});
+            // Put your image files in: src/main/resources/static/images/
+            cosmeticsData.put("Basic Staff", new Object[]{Rarity.COMMON, "images/WeaponBasicStaff.png"});
+            cosmeticsData.put("Hellfire Staff", new Object[]{Rarity.RARE, "images/HellfireStaff.png"});
 
             for (Map.Entry<String, Object[]> entry : cosmeticsData.entrySet()) {
                 String name = entry.getKey();
@@ -51,15 +47,30 @@ public class DataInitializerService {
 
     //Image converter
     private byte[] loadImageAsBytes(String path) throws IOException {
-        ClassPathResource resource = new ClassPathResource(path);
-        if (!resource.exists()) {
-            System.err.println("Warning: Image file not found at " + path + ". Using placeholder image.");
-            return createPlaceholderImage();
+        // Try classpath first (static/ is typical Spring Boot location)
+        ClassPathResource resource = new ClassPathResource("static/" + path);
+        if (resource.exists()) {
+            try (InputStream inputStream = resource.getInputStream()) {
+                return inputStream.readAllBytes();
+            }
         }
-    
-        try (InputStream inputStream = resource.getInputStream()) {
-            return inputStream.readAllBytes();
+
+        // Fallback: try without "static/" (if you placed directly under resources)
+        resource = new ClassPathResource(path);
+        if (resource.exists()) {
+            try (InputStream inputStream = resource.getInputStream()) {
+                return inputStream.readAllBytes();
+            }
         }
+
+        // Final fallback: try project file system location (useful during development)
+        Path fsPath = Paths.get("src", "main", "resources", "static", path);
+        if (Files.exists(fsPath)) {
+            return Files.readAllBytes(fsPath);
+        }
+
+        System.err.println("Warning: Image file not found at " + path + ". Using placeholder image.");
+        return createPlaceholderImage();
     }
 
     //Placeholder cosmetic image

@@ -19,6 +19,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Service.UserService;
+import edu.cit.lingguahey.model.EquippedCosmeticResponse;
 import edu.cit.lingguahey.model.ErrorResponse;
 import edu.cit.lingguahey.model.PasswordResetRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -250,5 +251,37 @@ public class UserController {
     public ResponseEntity<Long> getActiveTokenCount() {
         long activeTokens = userServ.getActiveTokenCount();
         return ResponseEntity.ok(activeTokens);
+    }
+
+    // Get Equipped Cosmetic
+    @GetMapping("/{id}/equipped-cosmetic")
+    @Operation(
+        summary = "Get a user's equipped cosmetic",
+        description = "Retrieves the currently equipped cosmetic item for the specified user.",
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved equipped cosmetic",
+                content = @Content(schema = @Schema(implementation = EquippedCosmeticResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "User not found",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            )
+        }
+    )
+    @PreAuthorize("#id == principal.userId or hasAuthority('admin:read')")
+    public ResponseEntity<EquippedCosmeticResponse> getEquippedCosmetic(@PathVariable int id) {
+        UserEntity user = userServ.getUserEntity(id);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        EquippedCosmeticResponse response = new EquippedCosmeticResponse();
+        if (user.getEquippedCosmetic() != null) {
+            response.setEquippedCosmetic(user.getEquippedCosmetic());
+        } else {
+            response.setEquippedCosmetic(null);
+        }
+        return ResponseEntity.ok(response);
     }
 }

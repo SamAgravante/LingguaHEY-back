@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import edu.cit.lingguahey.Entity.CosmeticEntity;
 import edu.cit.lingguahey.Entity.UserEntity;
 import edu.cit.lingguahey.Repository.UserRepository;
 import edu.cit.lingguahey.token.TokenRepository;
@@ -190,6 +191,17 @@ public class UserService {
         if (user.getSkipsLeft() > 0) {
             user.setSkipsLeft(user.getSkipsLeft() - 1);
             userRepo.save(user);
+        }
+    }
+
+    // Get Equipped Cosmetic
+    public CosmeticEntity getEquippedCosmetic(int userId) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        if (user.getEquippedCosmetic() != null) {
+            return user.getEquippedCosmetic();
+        } else {
+            return null;
         }
     }
 }
