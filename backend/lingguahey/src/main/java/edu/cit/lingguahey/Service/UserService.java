@@ -58,10 +58,14 @@ public class UserService {
                 }
             });
 
-            user.setFirstName(newUser.getFirstName());
+            if (newUser.getFirstName() != null && !newUser.getFirstName().trim().isEmpty()) {
+                user.setFirstName(newUser.getFirstName());
+            }
             user.setMiddleName(newUser.getMiddleName());
-            user.setLastName(newUser.getLastName());
-            user.setEmail(newUser.getEmail());
+            if (newUser.getLastName() != null && !newUser.getLastName().trim().isEmpty()) {
+                user.setLastName(newUser.getLastName());
+            }
+            //user.setEmail(newUser.getEmail());
             if (newUser.getPassword() != null && !newUser.getPassword().isBlank()) {
                 if (!passwordEncoder.matches(newUser.getPassword(), user.getPassword()) && !newUser.getPassword().startsWith("$2a$")) {
                     user.setPassword(passwordEncoder.encode(newUser.getPassword()));
