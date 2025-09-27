@@ -15,6 +15,8 @@ import edu.cit.lingguahey.token.Token;
 import edu.cit.lingguahey.token.TokenRepository;
 import edu.cit.lingguahey.token.TokenType;
 import edu.cit.lingguahey.Service.EmailService;
+import edu.cit.lingguahey.Service.InventoryService;
+
 import java.util.UUID;
 import java.util.Optional;
 
@@ -27,19 +29,22 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final EmailService emailService;
+    private final InventoryService inventoryService;
     @Value("${app.base-url}")
     private String baseUrl;
 
     public AuthenticationService(UserRepository repository, TokenRepository tokenRepository,
             PasswordEncoder passwordEncoder, JwtService jwtService,
             AuthenticationManager authenticationManager,
-            EmailService emailService) {
+            EmailService emailService,
+            InventoryService inventoryService) {
         this.repository = repository;
         this.tokenRepository = tokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.emailService = emailService;
+        this.inventoryService = inventoryService;
     }
 
     // register
@@ -73,6 +78,7 @@ public class AuthenticationService {
                 .build();
 
         var savedUser = repository.save(user);
+        inventoryService.grantDefaultCosmeticAndEquip(savedUser);
 
         if (request.getRole() == Role.TEACHER) {
             String verificationLink = baseUrl + "/api/lingguahey/auth/verify-email?token=" + verificationToken;

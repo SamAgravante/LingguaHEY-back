@@ -1,5 +1,6 @@
 package edu.cit.lingguahey.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,28 @@ public class InventoryService {
 
     @Autowired
     private CosmeticRepository cosmeticRepo;
+
+    // Grant user default cosmetic
+    @Transactional
+    public void grantDefaultCosmeticAndEquip(UserEntity user) {
+        final String defaultCosmeticName = "Basic Staff";
+
+        CosmeticEntity defaultCosmetic = cosmeticRepo.findByName(defaultCosmeticName)
+            .orElseThrow(() -> new EntityNotFoundException("Default cosmetic '" + defaultCosmeticName + "' not found. Check DataInitializerService."));
+        // Initialize inventory list
+        List<CosmeticEntity> inventory = user.getInventory();
+        if (inventory == null) {
+            inventory = new ArrayList<>();
+            user.setInventory(inventory);
+        }
+
+        if (!inventory.contains(defaultCosmetic)) {
+            inventory.add(defaultCosmetic);
+        }
+
+        user.setEquippedCosmetic(defaultCosmetic);
+        userRepo.save(user);
+    }
 
     // Read Inventory by id
     public List<CosmeticEntity> getUserInventory(int userId) {
