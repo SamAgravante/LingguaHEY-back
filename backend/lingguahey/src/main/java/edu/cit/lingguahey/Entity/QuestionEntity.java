@@ -2,6 +2,9 @@ package edu.cit.lingguahey.Entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -38,6 +41,7 @@ public class QuestionEntity {
 
     @OneToMany(mappedBy = "question")
     @JsonManagedReference(value = "question-choices")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<ChoiceEntity> choices;
 
     @OneToOne(cascade = CascadeType.ALL)

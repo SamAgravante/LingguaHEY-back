@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.cit.lingguahey.Entity.LevelEntity;
 import edu.cit.lingguahey.Entity.MonsterEntity;
 import edu.cit.lingguahey.Entity.MonsterType;
-import edu.cit.lingguahey.Entity.UserCompletedLevel;
 import edu.cit.lingguahey.Service.LevelService;
 import edu.cit.lingguahey.model.CompletedLevelResponse;
 import edu.cit.lingguahey.model.ErrorResponse;
@@ -29,7 +28,6 @@ import edu.cit.lingguahey.model.LevelEditRequest;
 import edu.cit.lingguahey.model.LevelMonsterResponse;
 import edu.cit.lingguahey.model.LevelResponse;
 import edu.cit.lingguahey.model.MonsterResponse;
-import edu.cit.lingguahey.model.UserCompletedLevelResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -178,38 +176,6 @@ public class LevelController {
             return ResponseEntity.noContent().build();
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Failed to delete level", e.getMessage()));
-        }
-    }
-
-    // Mark a level as completed for a user by id
-    @PostMapping("/{levelId}/complete/{userId}")
-    @Operation(
-        summary = "Marks a level as completed for a user",
-        description = "Records a level completion for a specific user. This action is idempotent and will not create a duplicate record if the user has already completed the level.",
-        responses = {
-            @ApiResponse(responseCode = "201", description = "Level successfully completed.",
-                content = @Content(schema = @Schema(implementation = UserCompletedLevel.class))
-            ),
-            @ApiResponse(responseCode = "400", description = "Level already completed by this user or invalid input.",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "404", description = "User or level not found.",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-            )
-        }
-    )
-    public ResponseEntity<?> completeLevel(@PathVariable int levelId, @PathVariable int userId) {
-        try {
-            UserCompletedLevel completedLevel = levelServ.completeLevel(userId, levelId);
-            UserCompletedLevelResponse response = new UserCompletedLevelResponse();
-            response.setUserId(completedLevel.getUser().getUserId());
-            response.setLevelId(completedLevel.getLevel().getLevelId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (IllegalArgumentException | EntityNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Failed to complete level", e.getMessage()));
         }
     }
 

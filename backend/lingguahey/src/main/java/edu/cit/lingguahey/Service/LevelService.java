@@ -156,6 +156,7 @@ public class LevelService {
             throw new IllegalArgumentException("A level must have at least one enemy.");
         }
         
+        levelToUpdate.setLevelName(request.getLevelName());
         levelToUpdate.setCoinsReward(request.getCoinsReward());
         levelToUpdate.setGemsReward(request.getGemsReward());
         

@@ -40,6 +40,9 @@ public class GameService {
     @Autowired
     private PotionShopService potionShopServ;
 
+    @Autowired
+    private LevelService levelServ;
+
     private GameSession currentGameSession;
     private boolean canUsePotion = true;
 
@@ -308,6 +311,7 @@ public class GameService {
             int gems = level.getGemsReward();
             
             userServ.rewardUser(currentGameSession.getUserId(), coins, gems);
+            levelServ.completeLevel(currentGameSession.getUserId(), currentGameSession.getLevelId());
         }
     }
 

@@ -1,4 +1,4 @@
-/*package edu.cit.lingguahey.Service;
+package edu.cit.lingguahey.Service;
 
 import com.google.cloud.texttospeech.v1.*;
 import com.google.protobuf.ByteString;
@@ -51,6 +51,4 @@ public class TextToSpeechService {
             textToSpeechClient.close();
         }
     }
-}*/
-
-// TEMPORARY CODE SINCE WE HAVE NO SERVICE KEY
+}
