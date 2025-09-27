@@ -69,7 +69,7 @@ public class PotionShopService {
                 user.setShield(user.getShield() + 1);
                 break;
             case SKIP:
-                user.setSkipsLeft(user.getSkipsLeft() + 1);
+                user.setSkipsLeft(0);
                 break;
             default:
                 throw new IllegalArgumentException("Invalid potion type: " + potionType.name());

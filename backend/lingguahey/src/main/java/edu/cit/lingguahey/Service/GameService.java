@@ -260,6 +260,7 @@ public class GameService {
                 throw new IllegalStateException("You do not have a skip available for this level.");
             }
         
+            potionShopServ.usePotion(userId, potionType);
             performSkip();
             userServ.consumeSkip(userId);
             currentGameSession.setSkipsLeft(0);
