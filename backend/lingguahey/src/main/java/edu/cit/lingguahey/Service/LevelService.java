@@ -297,4 +297,10 @@ public class LevelService {
         return uniqueMonsters;
     }
 
+    // Check for completed level by user id
+    @Transactional(readOnly = true)
+    public boolean isLevelCompletedByUser(int userId, int levelId) {
+        return userCompletedLevelRepo.existsByUserUserIdAndLevelLevelId(userId, levelId);
+    }
+
 }

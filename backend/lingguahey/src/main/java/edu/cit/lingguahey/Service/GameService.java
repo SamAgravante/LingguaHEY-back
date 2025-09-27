@@ -304,6 +304,11 @@ public class GameService {
     private void endGame(boolean isSuccess) {
         currentGameSession.setGameOver(true);
         if (isSuccess) {
+            if (levelServ.isLevelCompletedByUser(currentGameSession.getUserId(), currentGameSession.getLevelId())) {
+                System.out.println("User has already completed this level. No rewards given.");
+                return;
+            }
+
             LevelEntity level = levelRepo.findById(currentGameSession.getLevelId())
                     .orElseThrow(() -> new EntityNotFoundException("Level not found with ID: " + currentGameSession.getLevelId()));
             
