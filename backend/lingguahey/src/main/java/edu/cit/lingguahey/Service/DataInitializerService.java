@@ -30,11 +30,14 @@ public class DataInitializerService {
             Map<String, Object[]> cosmeticsData = new HashMap<>();
             // Put your image files in: src/main/resources/static/images/
             cosmeticsData.put("Basic Staff", new Object[]{Rarity.COMMON, "images/WeaponBasicStaff.png"});
+            cosmeticsData.put("Druid Staff", new Object[]{Rarity.COMMON, "images/DruidStaff.png"});
+            cosmeticsData.put("Holy Staff", new Object[]{Rarity.COMMON, "images/HolyStaff.png"});
+            cosmeticsData.put("Ruby Staff", new Object[]{Rarity.COMMON, "images/RubyStaff.png"});
             cosmeticsData.put("Hellfire Staff", new Object[]{Rarity.RARE, "images/HellfireStaff.png"});
+            cosmeticsData.put("Frost Staff", new Object[]{Rarity.RARE, "images/FrostStaff.png"});
             cosmeticsData.put("Staff of Life", new Object[]{Rarity.LEGENDARY, "images/StaffOfLife.png"});
             cosmeticsData.put("Staff of Primordial Fire", new Object[]{Rarity.LEGENDARY, "images/StaffOfPrimordialFire.png"});
             cosmeticsData.put("Dragon Void Staff", new Object[]{Rarity.MYTHIC, "images/DragonVoidStaff.png"});
-            cosmeticsData.put("Frost Staff", new Object[]{Rarity.RARE, "images/FrostStaff.png"});
 
             for (Map.Entry<String, Object[]> entry : cosmeticsData.entrySet()) {
                 String name = entry.getKey();

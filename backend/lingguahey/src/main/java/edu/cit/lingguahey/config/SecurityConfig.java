@@ -54,7 +54,8 @@ public class SecurityConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://localhost:5173", // local dev
-                    "https://lingguahey.vercel.app" // production
+                    "https://lingguahey.vercel.app", // production
+                    "https://lingguahey.netlify.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
