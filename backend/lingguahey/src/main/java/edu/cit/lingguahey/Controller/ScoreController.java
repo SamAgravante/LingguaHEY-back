@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -272,7 +274,14 @@ public class ScoreController {
     public ResponseEntity<Map<String, Double>> getActivityScoreStatistics(@PathVariable int activityId) {
         Map<String, Double> statistics = scoreService.getActivityScoreStatistics(activityId);
         return ResponseEntity.ok().body(statistics);
-    }   
+    }
+    
+    // Recalculate and broadcast leaderboard
+    @MessageMapping("/leaderboard/trigger/{activityId}")
+    public void handleLeaderboardTrigger(@DestinationVariable int activityId) {
+        // This method will be called when a client sends a message to /app/leaderboard/trigger/{activityId}
+        scoreService.recalculateAndBroadcastLeaderboard(activityId);
+    }
 
 
 }

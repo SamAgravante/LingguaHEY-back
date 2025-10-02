@@ -8,6 +8,8 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import edu.cit.lingguahey.Broadcaster.LiveActivityBroadcaster;
+import edu.cit.lingguahey.DTO.LiveActivityUpdate;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.cit.lingguahey.Entity.QuestionEntity;
@@ -38,6 +40,9 @@ public class ScoreService {
 
     @Autowired
     private UserScoreRepository userScoreRepo;
+
+    @Autowired
+    private LiveActivityBroadcaster liveActivityBroadcaster;
 
     // Create and Add Score to Question
     public ScoreEntity setScoreForQuestion(int questionId, int scoreValue) {
@@ -122,6 +127,11 @@ public class ScoreService {
 
         UserScore userScore = new UserScore(user, question, question.getScore().getScore());
         userScoreRepo.save(userScore);
+        
+        // Broadcast updated leaderboard
+        if (question.getLiveActivity() != null) {
+            recalculateAndBroadcastLeaderboard(question.getLiveActivity().getActivityId());
+        }
     }
 
     // Give Score to User for Translation Game
@@ -143,6 +153,11 @@ public class ScoreService {
 
         UserScore userScore = new UserScore(user, question, question.getScore().getScore());
         userScoreRepo.save(userScore);
+        
+        // Broadcast updated leaderboard
+        if (question.getLiveActivity() != null) {
+            recalculateAndBroadcastLeaderboard(question.getLiveActivity().getActivityId());
+        }
     }
 
     // Total Score for User (for Live Activities)
@@ -177,6 +192,18 @@ public class ScoreService {
     // Leaderboard
     public List<LeaderboardEntry> getLiveActivityLeaderboard(int activityId) {
         return userScoreRepo.findLeaderboardByLiveActivity(activityId);
+    }
+
+    // Recalculate and broadcast leaderboard
+    public void recalculateAndBroadcastLeaderboard(int activityId) {
+        List<LeaderboardEntry> leaderboard = getLiveActivityLeaderboard(activityId);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("leaderboard", leaderboard);
+        
+        liveActivityBroadcaster.broadcastUpdate(
+            activityId,
+            new LiveActivityUpdate(activityId, "LEADERBOARD_UPDATE", payload)
+        );
     }
 
     @Transactional
