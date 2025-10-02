@@ -52,7 +52,7 @@ public class UserActivityLiveService {
         if (existingEntryOpt.isPresent()) {
             UserActivityLive entry = existingEntryOpt.get();
             if (entry.isInLobby()) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("User already in lobby");
+                return ResponseEntity.ok("User already confirmed in lobby");
             } else {
                 entry.setInLobby(true);
                 userActivityLiveRepository.save(entry);
@@ -144,7 +144,7 @@ public class UserActivityLiveService {
             .toList();
 
         if (userActivities.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found in lobby");
+            return ResponseEntity.ok("User already left or was not found in the lobby.");
         }
         userActivityLiveRepository.deleteAll(userActivities);
         broadcastLobby(activityId);
