@@ -73,8 +73,8 @@ public class UserEntity implements UserDetails {
     
     @Builder.Default
     private boolean subscriptionStatus = false;
-    
-    private SubscriptionType subscriptionType;
+    @Builder.Default
+    private SubscriptionType subscriptionType = SubscriptionType.FREE;
 
     @Column(name = "subscription_start_date")
     @Temporal(TemporalType.TIMESTAMP)

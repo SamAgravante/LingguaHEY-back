@@ -53,6 +53,9 @@ public class ClassroomController {
             @ApiResponse(responseCode = "400", description = "Bad request",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             ),
+            @ApiResponse(responseCode = "403", description = "Forbidden: Teacher has reached the classroom limit for their subscription plan",
+                content = @Content(schema = @Schema(implementation = ErrorResponse.class))
+            ),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))
             )

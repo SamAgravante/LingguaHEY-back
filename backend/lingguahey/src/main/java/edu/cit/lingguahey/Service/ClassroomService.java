@@ -60,6 +60,30 @@ public class ClassroomService {
     @Transactional
     public ClassroomEntity postClassroomEntity(ClassroomEntity classroom) {
         UserEntity teacher = getCurrentUser();
+        
+        // Subscription Logic for Teachers
+        if (teacher.getRole() == Role.TEACHER) {
+            List<ClassroomEntity> existingClassrooms = classroomRepo.findByTeacherUserId(teacher.getUserId());
+            int currentClassroomCount = existingClassrooms.size();
+            
+            int maxClassrooms;
+            if (teacher.getSubscriptionType() == UserEntity.SubscriptionType.FREE) {
+                maxClassrooms = 1;
+            } else if (teacher.getSubscriptionType() == UserEntity.SubscriptionType.PREMIUM) {
+                maxClassrooms = 5;
+            } else {
+                maxClassrooms = 0; 
+            }
+
+            if (currentClassroomCount >= maxClassrooms) {
+                String message = String.format(
+                    "You have reached the limit of %d classroom(s) for your current subscription plan (%s).", 
+                    maxClassrooms, teacher.getSubscriptionType().name()
+                );
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, message);
+            }
+        }
+
         classroom.setTeacher(teacher);
         return classroomRepo.save(classroom);
     }
