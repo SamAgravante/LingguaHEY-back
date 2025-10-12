@@ -8,10 +8,10 @@ import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import edu.cit.lingguahey.Broadcaster.LiveActivityBroadcaster;
-import edu.cit.lingguahey.DTO.LiveActivityUpdate;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.cit.lingguahey.Broadcaster.LiveActivityBroadcaster;
+import edu.cit.lingguahey.DTO.LiveActivityUpdate;
 import edu.cit.lingguahey.Entity.QuestionEntity;
 import edu.cit.lingguahey.Entity.ScoreEntity;
 import edu.cit.lingguahey.Entity.UserEntity;
@@ -107,54 +107,78 @@ public class ScoreService {
         }
     }
 
-    // Give Score to User
-    public void awardScoreToUser(int questionId, int userId, int selectedChoiceId) {
+    //Return is the points added. Change lang if you want to balaance more
+    private int calculateTimeBonus(double timeTakenSeconds) {
+        if (timeTakenSeconds < 3) {
+            return 2;
+        } 
+        else if (timeTakenSeconds < 5) {
+            return 1;
+        }
+        return 0;
+    }
+
+
+    @Transactional
+    public void awardScoreToUser(int questionId, int userId, int selectedChoiceId, double timeTakenSeconds) {
         QuestionEntity question = questionRepo.findById(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
-        boolean isCorrectChoice = question.getChoices().stream()
-                .anyMatch(choice -> choice.getChoiceId() == selectedChoiceId && choice.isCorrect());
-        if (!isCorrectChoice) {
-            throw new IllegalArgumentException("The selected choice is incorrect.");
-        }
-
         userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
                 .ifPresent(existing -> {
-                    throw new IllegalStateException("User already has a score for this question.");
+                    throw new IllegalStateException("User already has a score for this question. Score: " + existing.getScore());
                 });
 
-        UserScore userScore = new UserScore(user, question, question.getScore().getScore());
+        boolean isCorrectChoice = question.getChoices().stream()
+                .anyMatch(choice -> choice.getChoiceId() == selectedChoiceId && choice.isCorrect());
+        
+        if (!isCorrectChoice) {
+            throw new IllegalArgumentException("The selected choice is incorrect."); 
+        }
+
+        int baseScore = question.getScore().getScore();
+        int timeBonus = calculateTimeBonus(timeTakenSeconds);
+        
+        int awardedScore = baseScore + timeBonus;
+
+
+        UserScore userScore = new UserScore(user, question, awardedScore);
         userScoreRepo.save(userScore);
         
-        // Broadcast updated leaderboard
         if (question.getLiveActivity() != null) {
             recalculateAndBroadcastLeaderboard(question.getLiveActivity().getActivityId());
         }
     }
 
-    // Give Score to User for Translation Game
-    public void awardScoreToUserForTranslationGame(int questionId, int userId, List<Integer> choiceIds) {
+    @Transactional
+    public void awardScoreToUserForTranslationGame(int questionId, int userId, List<Integer> choiceIds, double timeTakenSeconds) {
         QuestionEntity question = questionRepo.findById(questionId)
                 .orElseThrow(() -> new EntityNotFoundException("Question not found with ID: " + questionId));
         UserEntity user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
 
+        userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
+                .ifPresent(existing -> {
+                    throw new IllegalStateException("User already has a score for this question. Score: " + existing.getScore());
+                });
+                    
         boolean isCorrectChoice = choiceServ.validateTranslationGame(questionId, choiceIds);
+        
         if (!isCorrectChoice) {
             throw new IllegalArgumentException("The selected choices are not in the correct order.");
         }
 
-        userScoreRepo.findByUser_UserIdAndQuestion_QuestionId(userId, questionId)
-                .ifPresent(existing -> {
-                    throw new IllegalStateException("User already has a score for this question.");
-                });
+        int baseScore = question.getScore().getScore();
+        int timeBonus = calculateTimeBonus(timeTakenSeconds);
+        
+        int awardedScore = baseScore + timeBonus;
 
-        UserScore userScore = new UserScore(user, question, question.getScore().getScore());
+        UserScore userScore = new UserScore(user, question, awardedScore);
         userScoreRepo.save(userScore);
         
-        // Broadcast updated leaderboard
+        //Broadcast to Leaderboard
         if (question.getLiveActivity() != null) {
             recalculateAndBroadcastLeaderboard(question.getLiveActivity().getActivityId());
         }

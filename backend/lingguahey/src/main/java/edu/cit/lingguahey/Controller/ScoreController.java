@@ -2,6 +2,7 @@ package edu.cit.lingguahey.Controller;
 
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -161,8 +162,12 @@ public class ScoreController {
         }
     )
     @PreAuthorize("#userId == principal.userId or hasAuthority('admin:create')")
-    public ResponseEntity<Void> awardScoreToUser(@PathVariable int questionId, @PathVariable int userId, @RequestParam int selectedChoiceId) {
-        scoreService.awardScoreToUser(questionId, userId, selectedChoiceId);
+    public ResponseEntity<Void> awardScoreToUser(
+        @PathVariable int questionId, 
+        @PathVariable int userId, 
+        @RequestParam int selectedChoiceId,
+        @RequestParam double timeTakenSeconds) {
+        scoreService.awardScoreToUser(questionId, userId, selectedChoiceId, timeTakenSeconds);
         return ResponseEntity.ok().build();
     }
 
@@ -189,8 +194,12 @@ public class ScoreController {
         }
     )
     @PreAuthorize("#userId == principal.userId or hasAuthority('admin:create')")
-    public ResponseEntity<Void> awardScoreForTranslationGame(@PathVariable int questionId, @PathVariable int userId, @RequestBody List<Integer> userSelectedChoiceIds) {
-        scoreService.awardScoreToUserForTranslationGame(questionId, userId, userSelectedChoiceIds);
+    public ResponseEntity<Void> awardScoreForTranslationGame(
+        @PathVariable int questionId, 
+        @PathVariable int userId, 
+        @RequestParam double timeTakenSeconds,
+        @RequestBody List<Integer> userSelectedChoiceIds) {
+        scoreService.awardScoreToUserForTranslationGame(questionId, userId, userSelectedChoiceIds, timeTakenSeconds);
         return ResponseEntity.ok().build();
     }
      
