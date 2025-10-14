@@ -35,6 +35,7 @@ public class DataInitializerService {
             cosmeticsData.put("Ruby Staff", new Object[]{Rarity.COMMON, "images/RubyStaff.png"});
             cosmeticsData.put("Hellfire Staff", new Object[]{Rarity.RARE, "images/HellfireStaff.png"});
             cosmeticsData.put("Frost Staff", new Object[]{Rarity.RARE, "images/FrostStaff.png"});
+            cosmeticsData.put("Rod of Aclepius", new Object[]{Rarity.RARE, "images/RodOfAclepius.png"});
             cosmeticsData.put("Staff of Life", new Object[]{Rarity.LEGENDARY, "images/StaffOfLife.png"});
             cosmeticsData.put("Staff of Primordial Fire", new Object[]{Rarity.LEGENDARY, "images/StaffOfPrimordialFire.png"});
             cosmeticsData.put("Dragon Void Staff", new Object[]{Rarity.MYTHIC, "images/DragonVoidStaff.png"});
