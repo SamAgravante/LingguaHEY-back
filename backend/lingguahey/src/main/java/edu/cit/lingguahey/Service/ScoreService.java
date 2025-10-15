@@ -107,7 +107,7 @@ public class ScoreService {
         }
     }
 
-    //Return is the points added. Change lang if you want to balaance more
+    // Adds bonus points to user score from time constraints
     private int calculateTimeBonus(double timeTakenSeconds) {
         if (timeTakenSeconds < 3) {
             return 2;
@@ -119,6 +119,7 @@ public class ScoreService {
     }
 
 
+    // Give Score to User
     @Transactional
     public void awardScoreToUser(int questionId, int userId, int selectedChoiceId, double timeTakenSeconds) {
         QuestionEntity question = questionRepo.findById(questionId)
@@ -152,6 +153,7 @@ public class ScoreService {
         }
     }
 
+    // Give Score to User for Translation Game
     @Transactional
     public void awardScoreToUserForTranslationGame(int questionId, int userId, List<Integer> choiceIds, double timeTakenSeconds) {
         QuestionEntity question = questionRepo.findById(questionId)
@@ -178,7 +180,7 @@ public class ScoreService {
         UserScore userScore = new UserScore(user, question, awardedScore);
         userScoreRepo.save(userScore);
         
-        //Broadcast to Leaderboard
+        // Broadcast to Leaderboard
         if (question.getLiveActivity() != null) {
             recalculateAndBroadcastLeaderboard(question.getLiveActivity().getActivityId());
         }

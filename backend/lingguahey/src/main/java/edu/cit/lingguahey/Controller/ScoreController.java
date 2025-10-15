@@ -98,6 +98,7 @@ public class ScoreController {
         return ResponseEntity.ok().body(score);
     }
 
+    // Update Score for Question
     @PutMapping("/questions/{questionId}/score")
     @Operation(
         summary = "Update a score for a question",
@@ -116,9 +117,7 @@ public class ScoreController {
             )
         }
     )
-    public ResponseEntity<ScoreEntity> updateScoreForQuestion(
-            @PathVariable int questionId,
-            @RequestParam int scoreValue) {
+    public ResponseEntity<ScoreEntity> updateScoreForQuestion(@PathVariable int questionId, @RequestParam int scoreValue) {
         ScoreEntity score = scoreService.updateScoreForQuestion(questionId, scoreValue);
         return ResponseEntity.ok(score);
     }
@@ -162,11 +161,7 @@ public class ScoreController {
         }
     )
     @PreAuthorize("#userId == principal.userId or hasAuthority('admin:create')")
-    public ResponseEntity<Void> awardScoreToUser(
-        @PathVariable int questionId, 
-        @PathVariable int userId, 
-        @RequestParam int selectedChoiceId,
-        @RequestParam double timeTakenSeconds) {
+    public ResponseEntity<Void> awardScoreToUser(@PathVariable int questionId, @PathVariable int userId, @RequestParam int selectedChoiceId, @RequestParam double timeTakenSeconds) {
         scoreService.awardScoreToUser(questionId, userId, selectedChoiceId, timeTakenSeconds);
         return ResponseEntity.ok().build();
     }
@@ -194,11 +189,7 @@ public class ScoreController {
         }
     )
     @PreAuthorize("#userId == principal.userId or hasAuthority('admin:create')")
-    public ResponseEntity<Void> awardScoreForTranslationGame(
-        @PathVariable int questionId, 
-        @PathVariable int userId, 
-        @RequestParam double timeTakenSeconds,
-        @RequestBody List<Integer> userSelectedChoiceIds) {
+    public ResponseEntity<Void> awardScoreForTranslationGame(@PathVariable int questionId, @PathVariable int userId, @RequestParam double timeTakenSeconds, @RequestBody List<Integer> userSelectedChoiceIds) {
         scoreService.awardScoreToUserForTranslationGame(questionId, userId, userSelectedChoiceIds, timeTakenSeconds);
         return ResponseEntity.ok().build();
     }
