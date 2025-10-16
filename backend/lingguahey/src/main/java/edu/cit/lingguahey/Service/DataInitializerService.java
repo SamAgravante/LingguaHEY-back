@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -25,29 +26,40 @@ public class DataInitializerService {
 
     @PostConstruct
     public void init() throws IOException {
-        if (cosmeticRepo.count() == 0) {
-            //Cosmetics Map
-            Map<String, Object[]> cosmeticsData = new HashMap<>();
-            // Put your image files in: src/main/resources/static/images/
-            cosmeticsData.put("Basic Staff", new Object[]{Rarity.COMMON, "images/WeaponBasicStaff.png"});
-            cosmeticsData.put("Druid Staff", new Object[]{Rarity.COMMON, "images/DruidStaff.png"});
-            cosmeticsData.put("Holy Staff", new Object[]{Rarity.COMMON, "images/HolyStaff.png"});
-            cosmeticsData.put("Ruby Staff", new Object[]{Rarity.COMMON, "images/RubyStaff.png"});
-            cosmeticsData.put("Hellfire Staff", new Object[]{Rarity.RARE, "images/HellfireStaff.png"});
-            cosmeticsData.put("Frost Staff", new Object[]{Rarity.RARE, "images/FrostStaff.png"});
-            cosmeticsData.put("Staff of Life", new Object[]{Rarity.LEGENDARY, "images/StaffOfLife.png"});
-            cosmeticsData.put("Staff of Primordial Fire", new Object[]{Rarity.LEGENDARY, "images/StaffOfPrimordialFire.png"});
-            cosmeticsData.put("Dragon Void Staff", new Object[]{Rarity.MYTHIC, "images/DragonVoidStaff.png"});
+        //Cosmetics Map
+        Map<String, Object[]> cosmeticsData = new HashMap<>();
+        // Put image files in: src/main/resources/static/images/
+        cosmeticsData.put("Basic Staff", new Object[]{Rarity.COMMON, "images/WeaponBasicStaff.png"});
+        cosmeticsData.put("Druid Staff", new Object[]{Rarity.COMMON, "images/DruidStaff.png"});
+        cosmeticsData.put("Holy Staff", new Object[]{Rarity.COMMON, "images/HolyStaff.png"});
+        cosmeticsData.put("Ruby Staff", new Object[]{Rarity.COMMON, "images/RubyStaff.png"});
+        cosmeticsData.put("Hellfire Staff", new Object[]{Rarity.RARE, "images/HellfireStaff.png"});
+        cosmeticsData.put("Frost Staff", new Object[]{Rarity.RARE, "images/FrostStaff.png"});
+        cosmeticsData.put("Staff of Life", new Object[]{Rarity.LEGENDARY, "images/StaffOfLife.png"});
+        cosmeticsData.put("Staff of Primordial Fire", new Object[]{Rarity.LEGENDARY, "images/StaffOfPrimordialFire.png"});
+        cosmeticsData.put("Dragon Void Staff", new Object[]{Rarity.MYTHIC, "images/DragonVoidStaff.png"});
 
-            for (Map.Entry<String, Object[]> entry : cosmeticsData.entrySet()) {
-                String name = entry.getKey();
-                Rarity rarity = (Rarity) entry.getValue()[0];
-                String imagePath = (String) entry.getValue()[1];
+        for (Map.Entry<String, Object[]> entry : cosmeticsData.entrySet()) {
+            String name = entry.getKey();
+            Rarity rarity = (Rarity) entry.getValue()[0];
+            String imagePath = (String) entry.getValue()[1];
 
-                byte[] imageData = loadImageAsBytes(imagePath);
+            byte[] imageData = loadImageAsBytes(imagePath);
+
+            Optional<CosmeticEntity> existingCosmetic = cosmeticRepo.findByName(name);
+
+            if (existingCosmetic.isPresent()) {
+                CosmeticEntity cosmetic = existingCosmetic.get();
                 
-                CosmeticEntity cosmetic = new CosmeticEntity(name, rarity, imageData);
+                // Update properties if they are different
+                cosmetic.setRarity(rarity); 
+                cosmetic.setCosmeticImage(imageData);
+                
                 cosmeticRepo.save(cosmetic);
+                
+            } else {
+                CosmeticEntity newCosmetic = new CosmeticEntity(name, rarity, imageData);
+                cosmeticRepo.save(newCosmetic);
             }
         }
     }
