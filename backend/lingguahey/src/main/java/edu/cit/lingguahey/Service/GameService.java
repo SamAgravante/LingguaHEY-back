@@ -165,7 +165,7 @@ public class GameService {
 
         return new MonsterResponse(
                 monsterToDisplay.getMonsterId(),
-                null,
+                monsterToDisplay.getTagalogName(),
                 monsterToDisplay.getEnglishName(),
                 monsterToDisplay.getDescription(),
                 monsterToDisplay.getImageData(),
