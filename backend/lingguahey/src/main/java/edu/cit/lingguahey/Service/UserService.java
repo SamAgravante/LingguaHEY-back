@@ -74,6 +74,11 @@ public class UserService {
             user.setIdNumber(newUser.getIdNumber());
             user.setSubscriptionStatus(newUser.getSubscriptionStatus());
             user.setProfilePic(newUser.getProfilePic());
+            // Tutorial
+            user.setDungeonTutorialCheckpoint(newUser.isDungeonTutorialCheckpoint());
+            user.setTownTutorialCheckpoint(newUser.isTownTutorialCheckpoint());
+            user.setShopTutorialCheckpoint(newUser.isShopTutorialCheckpoint());
+            user.setSummonTutorialCheckpoint(newUser.isSummonTutorialCheckpoint());
             return userRepo.save(user);
         } catch (NoSuchElementException e) {
             throw new EntityNotFoundException("User "+ userId + "not found!");

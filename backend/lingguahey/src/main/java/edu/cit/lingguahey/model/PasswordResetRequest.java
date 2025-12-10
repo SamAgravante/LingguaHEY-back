@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 public class PasswordResetRequest {
-    @Schema(description = "Current (old) password", required = true)
+    @Schema(description = "Current (old) password")
     private String oldPassword;
-    @Schema(description = "Desired new password", required = true)
+    @Schema(description = "Desired new password")
     private String newPassword;
 }

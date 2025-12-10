@@ -146,7 +146,7 @@ public class UserController {
         }
     )
     // access
-    @PreAuthorize("#id == principal.userId or hasAuthority('admin:delete')")
+    @PreAuthorize("#id == principal.userId or hasAuthority('admin:delete') or hasAuthority('teacher:delete')")
     public String deleteUserEntity(@PathVariable int id){
         return userServ.deleteUserEntity(id);
     }

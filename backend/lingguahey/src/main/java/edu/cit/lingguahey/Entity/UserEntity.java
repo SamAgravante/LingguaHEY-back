@@ -55,15 +55,23 @@ public class UserEntity implements UserDetails {
     private String idNumber;
 
     @Builder.Default
-    private int gems = 0;
+    private int gems = 200;
     @Builder.Default
-    private int coins = 0;
+    private int coins = 100;
     @Builder.Default
     private int lives = 4;
     @Builder.Default
     private int shield = 0;
     @Builder.Default
     private int skipsLeft = 0;
+    @Builder.Default
+    private boolean dungeonTutorialCheckpoint = false;
+    @Builder.Default
+    private boolean townTutorialCheckpoint = false;
+    @Builder.Default
+    private boolean shopTutorialCheckpoint = false;
+    @Builder.Default
+    private boolean summonTutorialCheckpoint = false;
 
     @ElementCollection
     @CollectionTable(name = "user_potions", joinColumns = @JoinColumn(name = "user_id"))
@@ -176,12 +184,13 @@ public class UserEntity implements UserDetails {
     @JsonManagedReference(value = "classroom-teacher")
     private List<ClassroomEntity> classrooms;
 
-    @ManyToMany
+    //Ghost Table
+    /*@ManyToMany
     @JoinTable(
         name = "user_activities",
         joinColumns = @JoinColumn(name = "user_id"),
         inverseJoinColumns = @JoinColumn(name = "activity_id")
-    )
+    )*/
 
     @ManyToOne
     @JoinColumn(name = "activity_id")
@@ -396,4 +405,37 @@ public class UserEntity implements UserDetails {
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
     }
+
+    public boolean isDungeonTutorialCheckpoint() {
+        return dungeonTutorialCheckpoint;
+    }
+
+    public void setDungeonTutorialCheckpoint(boolean dungeonTutorialCheckpoint) {
+        this.dungeonTutorialCheckpoint = dungeonTutorialCheckpoint;
+    }
+
+    public boolean isTownTutorialCheckpoint() {
+        return townTutorialCheckpoint;
+    }
+
+    public void setTownTutorialCheckpoint(boolean townTutorialCheckpoint) {
+        this.townTutorialCheckpoint = townTutorialCheckpoint;
+    }
+
+    public boolean isShopTutorialCheckpoint() {
+        return shopTutorialCheckpoint;
+    }
+
+    public void setShopTutorialCheckpoint(boolean shopTutorialCheckpoint) {
+        this.shopTutorialCheckpoint = shopTutorialCheckpoint;
+    }
+
+    public boolean isSummonTutorialCheckpoint() {
+        return summonTutorialCheckpoint;
+    }
+
+    public void setSummonTutorialCheckpoint(boolean summonTutorialCheckpoint) {
+        this.summonTutorialCheckpoint = summonTutorialCheckpoint;
+    }
+    
 }
